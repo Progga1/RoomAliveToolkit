@@ -90,6 +90,7 @@
     <Compile Include="ProjectionMappingSample.cs" />
     <Compile Include="ProjectiveTexturingShader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Settings.cs" />
     <Compile Include="VideoPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>

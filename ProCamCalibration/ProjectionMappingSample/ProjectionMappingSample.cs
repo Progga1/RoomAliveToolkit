@@ -1,4 +1,4 @@
-﻿using SharpDX;
+using SharpDX;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using SharpDX.WIC;
@@ -47,9 +47,10 @@ namespace RoomAliveToolkit
             foreach (var camera in ensemble.cameras)
                 cameraDeviceResources[camera] = new CameraDeviceResource(device, camera, renderLock, directory);
 
-            // one user view
-            // user view render target, depth buffer, viewport for user view
-            var userViewTextureDesc = new Texture2DDescription()
+			// [Andreas] Alternatively: swapChain.GetBackBuffer<D3D11.Texture2D>(0)
+			// one user view
+			// user view render target, depth buffer, viewport for user view
+			var userViewTextureDesc = new Texture2DDescription()
             {
                 Width = userViewTextureWidth,
                 Height = userViewTextureHeight,

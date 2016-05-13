@@ -37,7 +37,7 @@ namespace RoomAliveToolkit.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool WobbleEffectEnabled {
             get {
                 return ((bool)(this["WobbleEffectEnabled"]));
@@ -49,7 +49,7 @@ namespace RoomAliveToolkit.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool LocalHeadTrackingEnabled {
             get {
                 return ((bool)(this["LocalHeadTrackingEnabled"]));
@@ -73,7 +73,7 @@ namespace RoomAliveToolkit.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool FullScreenEnabled {
             get {
                 return ((bool)(this["FullScreenEnabled"]));
