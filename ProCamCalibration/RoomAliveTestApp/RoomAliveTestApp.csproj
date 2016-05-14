@@ -68,6 +68,8 @@
     <Compile Include="AppForm.Designer.cs">
       <DependentUpon>AppForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="InputCallbacks.cs" />
+    <Compile Include="RenderSurface.cs" />
     <Compile Include="TestApp.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
