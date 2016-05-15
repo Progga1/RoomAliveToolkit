@@ -18,18 +18,24 @@ using SharpGraphics;
 using RoomAliveToolkit;
 using System.Runtime.InteropServices;
 using RoomAliveTestApp.Shaders;
+using System.Threading;
 
 namespace RoomAliveTestApp {
 
 	class TestApp : ApplicationContext, IDisposable, InputCallbacks {
 
 		RenderSurface mainSurface;
+		RenderSurface meshSurface;
 
 		//Triangle members
-		private Vector3[] vertices = new Vector3[] { new Vector3(-0.5f,0.5f,0.0f),new Vector3(0.5f,0.5f,0.0f),new Vector3(0.0f,-0.5f,0.0f) };
+		private Vector3[] triangleVertices = new Vector3[] { new Vector3(-0.5f,0.5f,0.0f),new Vector3(0.5f,0.5f,0.0f),new Vector3(0.0f,-0.5f,0.0f) };
+		private Vector3[] quadVertices = new Vector3[] { new Vector3(0,1,0),new Vector3(1,1,0),new Vector3(0,0,0),new Vector3(1,0,0) };
 		private D3D11.Buffer triangleVertexBuffer;
+		private D3D11.Buffer quadVertexBuffer;
 		private D3D11.VertexBufferBinding triangleBinding;
+		private D3D11.VertexBufferBinding quadBinding;
 		private SingleColorShader singleColorShader;
+		private SingleColorShader singleColorShader2;
 		private float[] mvp = new float[16];
 
 		//RoomAlive objects
@@ -47,25 +53,32 @@ namespace RoomAliveTestApp {
 
 		public TestApp() {
 
-			//----Init-SharpDX----
-
-			mainSurface = new RenderSurface(RenderCallback);
-			mainSurface.initWindowed("Render",640,480);
-			mainSurface.setInputCallback(this);
-
-			//----Init-drawing----
-
-			triangleVertexBuffer = D3D11.Buffer.Create<Vector3>(mainSurface.device,D3D11.BindFlags.VertexBuffer,vertices);
-			triangleBinding = new D3D11.VertexBufferBinding(triangleVertexBuffer,Utilities.SizeOf<Vector3>(),0);
-			singleColorShader = new SingleColorShader(mainSurface.device);
-
-			//----Init-RoomAlive----
-
 			ensemble = RoomAliveToolkit.ProjectorCameraEnsemble.FromFile("C:/Users/Progga/Documents/Visual Studio 2015/Projects/RoomAliveToolkit/calibration/single_projector4/calibration4.xml");
 
-			//----Start-----
+			new Thread(new ThreadStart(() => {
+				mainSurface = new RenderSurface(RenderCallback);
+				mainSurface.setInputCallback(this);
+				mainSurface.initWindowed("Triangle",640,480);
 
-			mainSurface.run();
+				triangleVertexBuffer = D3D11.Buffer.Create<Vector3>(mainSurface.device,D3D11.BindFlags.VertexBuffer,triangleVertices);
+				triangleBinding = new D3D11.VertexBufferBinding(triangleVertexBuffer,Utilities.SizeOf<Vector3>(),0);
+				singleColorShader = new SingleColorShader(mainSurface.device);
+
+				mainSurface.run();
+			})).Start();
+
+			new Thread(new ThreadStart(() => {
+				meshSurface = new RenderSurface(RenderCallback);
+				meshSurface.setInputCallback(this);
+				meshSurface.clearColor = new Color(45,45,45);
+				meshSurface.initWindowed("Mesh",640,480);
+
+				quadVertexBuffer = D3D11.Buffer.Create<Vector3>(meshSurface.device,D3D11.BindFlags.VertexBuffer,quadVertices);
+				quadBinding = new D3D11.VertexBufferBinding(quadVertexBuffer,Utilities.SizeOf<Vector3>(),0);
+				singleColorShader2 = new SingleColorShader(meshSurface.device);
+
+				meshSurface.run();
+			})).Start();
 		}
 
 		private void RenderCallback(D3DDeviceContext context,RenderSurface sender) {
@@ -77,13 +90,23 @@ namespace RoomAliveTestApp {
 				singleColorShader.passColor(1,0.5f,0,1);
 				context.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
 				context.InputAssembler.SetVertexBuffers(0,triangleBinding);
-				context.Draw(vertices.Count(),0);
+				context.Draw(triangleVertices.Count(),0);
 			}
-			
+			if(sender==meshSurface) {
+				SharpDX.Matrix mvpMat = meshSurface.getProjectionMatrix();
+				mvp = mvpMat.ToArray();
+				context.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleStrip;
+				singleColorShader2.activate();
+				singleColorShader2.updateVSConstantBuffer(mvp);
+				singleColorShader2.passColor(1,0,0,1);
+				context.InputAssembler.SetVertexBuffers(0,quadBinding);
+				context.Draw(4,0);
+			}
 		}
 
 		public new void Dispose() {
 			mainSurface.Dispose();
+			meshSurface.Dispose();
 			triangleVertexBuffer.Dispose();
 			singleColorShader.Dispose();
 		}
@@ -103,10 +126,10 @@ namespace RoomAliveTestApp {
 					id = 1;
 				if(mouseEvent.button==MouseButtons.Middle)
 					id = 2;
-				vertices[id].X = mouseEvent.x;
-				vertices[id].Y = mouseEvent.y;
+				triangleVertices[id].X = mouseEvent.x;
+				triangleVertices[id].Y = mouseEvent.y;
 
-				mainSurface.context.UpdateSubresource(vertices,triangleVertexBuffer);
+				mainSurface.context.UpdateSubresource(triangleVertices,triangleVertexBuffer);
 			}
 		}
 
