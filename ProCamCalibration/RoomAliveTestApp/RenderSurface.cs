@@ -38,6 +38,9 @@ namespace SharpGraphics {
 		public RenderForm renderForm { get; private set; }
 		public D3D11.RenderTargetView renderTargetView { get; private set; }
 
+		//Rendering
+		private Matrix projMat;
+
 		public RenderSurface(Action<D3DDeviceContext,RenderSurface> drawCallback) {
 			OnDraw = drawCallback;
 		}
@@ -46,6 +49,7 @@ namespace SharpGraphics {
 			this.width = width;
 			this.height = height;
 			this.ratioX = (float)width/height;
+			setOrthographicProjection();
 			renderForm = new RenderForm(title);
 			renderForm.ClientSize = new System.Drawing.Size(width,height);
 
@@ -75,6 +79,18 @@ namespace SharpGraphics {
 			}
 
 			context.OutputMerger.SetRenderTargets(renderTargetView);
+		}
+
+		public void setOrthographicProjection(int zoom,float near,float far) {
+			Matrix.OrthoLH(ratioX*zoom,zoom,near,far,out projMat);
+		}
+
+		public void setOrthographicProjection() {
+			setOrthographicProjection(1,-1,1);
+		}
+
+		public Matrix getProjectionMatrix() {
+			return projMat;
 		}
 
 		public void setInputCallback(InputCallbacks callbacks) {

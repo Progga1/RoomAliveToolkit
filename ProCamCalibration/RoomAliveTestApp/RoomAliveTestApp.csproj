@@ -62,25 +62,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AppForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="AppForm.Designer.cs">
-      <DependentUpon>AppForm.cs</DependentUpon>
-    </Compile>
     <Compile Include="InputCallbacks.cs" />
     <Compile Include="RenderSurface.cs" />
+    <Compile Include="ShaderBase.cs" />
     <Compile Include="TestApp.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="AppForm.resx">
-      <DependentUpon>AppForm.cs</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ProCamEnsembleCalibration\ProCamEnsembleCalibrationLib.csproj">

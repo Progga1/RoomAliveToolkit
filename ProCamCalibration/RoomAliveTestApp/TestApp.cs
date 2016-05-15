@@ -30,10 +30,7 @@ namespace RoomAliveTestApp {
 		private D3D11.InputElement[] inputElements = new D3D11.InputElement[] { new D3D11.InputElement("POSITION", 0, Format.R32G32B32_Float, 0) };
 		private D3D11.Buffer triangleVertexBuffer;
 		private D3D11.VertexBufferBinding binding;
-		private ShaderSignature inputSignature;
-		private D3D11.InputLayout inputLayout;
-		private D3D11.VertexShader vertexShader;
-		private D3D11.PixelShader pixelShader;
+		private ShaderBase singleColorShader;
 
 		//RoomAlive objects
 		private ProjectorCameraEnsemble ensemble;
@@ -65,14 +62,9 @@ namespace RoomAliveTestApp {
 			triangleVertexBuffer = D3D11.Buffer.Create<Vector3>(device,D3D11.BindFlags.VertexBuffer,vertices);
 			binding = new D3D11.VertexBufferBinding(triangleVertexBuffer,Utilities.SizeOf<Vector3>(),0);
 
-			using(var vertexShaderByteCode = ShaderBytecode.CompileFromFile("vertexShader.hlsl","main","vs_4_0",ShaderFlags.Debug)) {
-				vertexShader = new D3D11.VertexShader(device,vertexShaderByteCode);
-				inputSignature = ShaderSignature.GetInputSignature(vertexShaderByteCode);
-			}
-			using(var pixelShaderByteCode = ShaderBytecode.CompileFromFile("pixelShader.hlsl","main","ps_4_0",ShaderFlags.Debug)) {
-				pixelShader = new D3D11.PixelShader(device,pixelShaderByteCode);
-			}
-			inputLayout = new D3D11.InputLayout(device,inputSignature,inputElements);
+			singleColorShader = new ShaderBase(16*sizeof(float),device);
+			singleColorShader.fromFiles("vertexShader.hlsl","pixelShader.hlsl");
+			singleColorShader.setInputElements(inputElements);
 			
 			context.Rasterizer.SetViewport(new Viewport(0,0,surface.width,surface.height));
 
@@ -87,23 +79,17 @@ namespace RoomAliveTestApp {
 		}
 
 		private void RenderCallback(D3DDeviceContext context,RenderSurface sender) {
-			context.VertexShader.Set(vertexShader);
-			context.PixelShader.Set(pixelShader);
+			singleColorShader.activate();
 			context.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
-			context.InputAssembler.InputLayout = inputLayout;
 			context.InputAssembler.SetVertexBuffers(0,binding);
 			
 			context.Draw(vertices.Count(),0);
-
 		}
 
 		public new void Dispose() {
 			surface.Dispose();
 			triangleVertexBuffer.Dispose();
-			vertexShader.Dispose();
-			pixelShader.Dispose();
-			inputLayout.Dispose();
-			inputSignature.Dispose();
+			singleColorShader.Dispose();
 		}
 
 		public void MouseDown(NormMouseEvent mouseEvent) {
