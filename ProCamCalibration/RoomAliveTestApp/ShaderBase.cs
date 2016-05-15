@@ -17,8 +17,9 @@ namespace RoomAliveTestApp {
 		private D3D11.PixelShader pixelShader;
 		private ShaderSignature inputSignature;
 		private D3D11.InputLayout inputLayout;
+		private D3D11.Buffer uniformBuffer;
 
-		public ShaderBase(int uniformBytes,D3D11.Device device) {
+		public ShaderBase(D3D11.Device device,int uniformBytes) {
 			this.device = device;
 			this.context = device.ImmediateContext;
 			var constantBufferDesc = new BufferDescription() {
@@ -29,6 +30,7 @@ namespace RoomAliveTestApp {
 				StructureByteStride = 0,
 				OptionFlags = 0,
 			};
+			uniformBuffer = new D3D11.Buffer(device,constantBufferDesc);
 		}
 
 		public void fromFiles(string vsFilename,string psFilename) {
@@ -39,15 +41,32 @@ namespace RoomAliveTestApp {
 			using(var pixelShaderByteCode = ShaderBytecode.CompileFromFile(psFilename,"main","ps_4_0",ShaderFlags.Debug)) {
 				pixelShader = new D3D11.PixelShader(device,pixelShaderByteCode);
 			}
+			
 		}
 
 		public void setInputElements(D3D11.InputElement[] elements) {
 			inputLayout = new D3D11.InputLayout(device,inputSignature,elements);
 		}
 
+		public void updateUniforms<T>(T values) where T : struct {
+			SharpDX.DataStream dataStream;
+			context.MapSubresource(uniformBuffer,MapMode.WriteDiscard,MapFlags.None,out dataStream);
+			dataStream.Write<T>(values);
+			context.UnmapSubresource(uniformBuffer,0);
+		}
+
+		public void updateUniforms(float[] values) {
+			SharpDX.DataStream dataStream;
+			context.MapSubresource(uniformBuffer,MapMode.WriteDiscard,MapFlags.None,out dataStream);
+			for(int i=0;i<16;i++)
+				dataStream.Write(values[i]);
+			context.UnmapSubresource(uniformBuffer,0);
+		}
+
 		public void activate() {
 			context.VertexShader.Set(vertexShader);
 			context.PixelShader.Set(pixelShader);
+			context.VertexShader.SetConstantBuffer(0,uniformBuffer);
 			context.InputAssembler.InputLayout = inputLayout;
 		}
 

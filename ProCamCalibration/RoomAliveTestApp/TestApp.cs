@@ -16,8 +16,13 @@ using SharpDX.Direct3D;
 using SharpGraphics;
 
 using RoomAliveToolkit;
+using System.Runtime.InteropServices;
 
 namespace RoomAliveTestApp {
+
+	struct SingleColorUniforms {
+		public float[] mvp;
+	}
 
 	class TestApp : ApplicationContext, IDisposable, InputCallbacks {
 
@@ -31,6 +36,8 @@ namespace RoomAliveTestApp {
 		private D3D11.Buffer triangleVertexBuffer;
 		private D3D11.VertexBufferBinding binding;
 		private ShaderBase singleColorShader;
+		private SingleColorUniforms uniformVals = new SingleColorUniforms();
+		private float[] mvp = new float[16];
 
 		//RoomAlive objects
 		private ProjectorCameraEnsemble ensemble;
@@ -62,7 +69,7 @@ namespace RoomAliveTestApp {
 			triangleVertexBuffer = D3D11.Buffer.Create<Vector3>(device,D3D11.BindFlags.VertexBuffer,vertices);
 			binding = new D3D11.VertexBufferBinding(triangleVertexBuffer,Utilities.SizeOf<Vector3>(),0);
 
-			singleColorShader = new ShaderBase(16*sizeof(float),device);
+			singleColorShader = new ShaderBase(device,16*sizeof(float));
 			singleColorShader.fromFiles("vertexShader.hlsl","pixelShader.hlsl");
 			singleColorShader.setInputElements(inputElements);
 			
@@ -80,9 +87,11 @@ namespace RoomAliveTestApp {
 
 		private void RenderCallback(D3DDeviceContext context,RenderSurface sender) {
 			singleColorShader.activate();
+			SharpDX.Matrix mvpMat = surface.getProjectionMatrix();
+			mvp = mvpMat.ToArray();
+			singleColorShader.updateUniforms(mvp);
 			context.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
 			context.InputAssembler.SetVertexBuffers(0,binding);
-			
 			context.Draw(vertices.Count(),0);
 		}
 

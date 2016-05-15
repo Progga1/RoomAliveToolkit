@@ -82,7 +82,7 @@ namespace SharpGraphics {
 		}
 
 		public void setOrthographicProjection(int zoom,float near,float far) {
-			Matrix.OrthoLH(ratioX*zoom,zoom,near,far,out projMat);
+			Matrix.OrthoLH(ratioX*zoom*2,zoom*2,near,far,out projMat);
 		}
 
 		public void setOrthographicProjection() {
