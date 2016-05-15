@@ -28,6 +28,10 @@ namespace RoomAliveTestApp.Shaders {
 			updatePSConstantBuffer<FloatColor>(color);
 		}
 
+		public void passColor(FloatColor color) {
+			updatePSConstantBuffer<FloatColor>(color);
+		}
+
 	}
 
 }
