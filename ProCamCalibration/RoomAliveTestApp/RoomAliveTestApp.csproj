@@ -62,6 +62,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CameraControl.cs" />
     <Compile Include="FloatColor.cs" />
     <Compile Include="InputCallbacks.cs" />
     <Compile Include="RenderSurface.cs" />

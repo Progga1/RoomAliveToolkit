@@ -10,16 +10,17 @@ namespace SharpGraphics {
 
 	public class NormMouseEvent {
 		public float x, y;
+		public float dx, dy;
 		public MouseButtons button;
 		public RenderSurface sender;
 	}
 
 	public interface InputCallbacks {
 
-		void MouseDown(NormMouseEvent mouseEvent);
-		void MouseMove(NormMouseEvent mouseEvent);
-		void MouseDrag(NormMouseEvent mouseEvent);
-		void MouseUp(NormMouseEvent mouseEvent);
+		void MouseDown(NormMouseEvent ev);
+		void MouseMove(NormMouseEvent ev);
+		void MouseDrag(NormMouseEvent ev);
+		void MouseUp(NormMouseEvent ev);
 		void MouseWheel(int amount,RenderSurface sender);
 		void KeyDown(Keys code,RenderSurface sender);
 		void KeyUp(Keys code,RenderSurface sender);

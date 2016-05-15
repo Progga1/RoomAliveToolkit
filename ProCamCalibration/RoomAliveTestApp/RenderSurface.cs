@@ -30,6 +30,7 @@ namespace SharpGraphics {
 		private InputCallbacks inputCallbacks;
 		private NormMouseEvent mouseEvent = new NormMouseEvent();
 		private MouseButtons mouseDragButton = MouseButtons.None;
+		private float lstX, lstY;
 
 		//SharpDX objects
 		public D3DDevice device;
@@ -82,12 +83,16 @@ namespace SharpGraphics {
 			context.Rasterizer.SetViewport(new Viewport(0,0,width,height));
 		}
 
-		public void setOrthographicProjection(int zoom,float near,float far) {
-			Matrix.OrthoLH(ratioX*zoom*2,zoom*2,near,far,out projMat);
+		public void setOrthographicProjection(float zoom,float near,float far) {
+			Matrix.OrthoRH(ratioX*zoom*2,zoom*2,near,far,out projMat);
 		}
 
 		public void setOrthographicProjection() {
 			setOrthographicProjection(1,-1,1);
+		}
+
+		public void setPerspectiveProjection(float fovy,float near,float far) {
+			Matrix.PerspectiveFovRH(fovy,ratioX,near,far,out projMat);
 		}
 
 		public Matrix getProjectionMatrix() {
@@ -127,12 +132,18 @@ namespace SharpGraphics {
 		private NormMouseEvent CreateMouseEvent(MouseEventArgs ev) {
 			mouseEvent.x = pixelToNormX(ev.X);
 			mouseEvent.y = pixelToNormY(ev.Y);
+			mouseEvent.dx = mouseEvent.x-lstX;
+			mouseEvent.dy = mouseEvent.y-lstY;
+			lstX = mouseEvent.x;
+			lstY = mouseEvent.y;
 			mouseEvent.button = ev.Button;
 			mouseEvent.sender = this;
 			return mouseEvent;
 		}
 
 		public void MouseDown(object sender,MouseEventArgs ev) {
+			lstX = pixelToNormX(ev.X);
+			lstY = pixelToNormY(ev.Y);
 			mouseDragButton = ev.Button;
 			if(inputCallbacks!=null) {
 				CreateMouseEvent(ev);
@@ -153,7 +164,7 @@ namespace SharpGraphics {
 
 		public void MouseWheel(object sender, MouseEventArgs ev) {
 			if(inputCallbacks!=null) {
-				inputCallbacks.MouseWheel(ev.Delta,this);
+				inputCallbacks.MouseWheel(ev.Delta>0?1:-1,this);
 			}
 		}
 
