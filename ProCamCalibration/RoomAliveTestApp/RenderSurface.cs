@@ -79,6 +79,7 @@ namespace SharpGraphics {
 			}
 
 			context.OutputMerger.SetRenderTargets(renderTargetView);
+			context.Rasterizer.SetViewport(new Viewport(0,0,width,height));
 		}
 
 		public void setOrthographicProjection(int zoom,float near,float far) {

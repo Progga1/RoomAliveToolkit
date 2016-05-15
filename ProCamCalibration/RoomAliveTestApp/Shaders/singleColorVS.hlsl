@@ -1,5 +1,4 @@
-cbuffer constants : register(b0)
-{
+cbuffer constants : register(b0) {
 	matrix mvpTransform;
 }
 

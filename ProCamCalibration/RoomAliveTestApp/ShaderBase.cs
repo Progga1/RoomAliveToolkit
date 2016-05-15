@@ -11,62 +11,90 @@ namespace RoomAliveTestApp {
 
 	class ShaderBase : IDisposable {
 
+		public static int SIZE_F = 4;
+
 		private D3D11.Device device;
 		private D3D11.DeviceContext context;
 		private D3D11.VertexShader vertexShader;
 		private D3D11.PixelShader pixelShader;
 		private ShaderSignature inputSignature;
 		private D3D11.InputLayout inputLayout;
-		private D3D11.Buffer uniformBuffer;
+		private D3D11.Buffer vsConstantBuffer;
+		private D3D11.Buffer psConstantBuffer;
 
-		public ShaderBase(D3D11.Device device,int uniformBytes) {
+		public ShaderBase(D3D11.Device device,int vsConstantBufferBytes,int psConstantBufferBytes) {
 			this.device = device;
 			this.context = device.ImmediateContext;
-			var constantBufferDesc = new BufferDescription() {
+			var vsConstantBufferDesc = new BufferDescription() {
 				Usage = ResourceUsage.Dynamic,
 				BindFlags = BindFlags.ConstantBuffer,
-				SizeInBytes = uniformBytes,
+				SizeInBytes = vsConstantBufferBytes,
 				CpuAccessFlags = CpuAccessFlags.Write,
 				StructureByteStride = 0,
 				OptionFlags = 0,
 			};
-			uniformBuffer = new D3D11.Buffer(device,constantBufferDesc);
+			vsConstantBuffer = new D3D11.Buffer(device,vsConstantBufferDesc);
+			var psConstantBufferDesc = new BufferDescription() {
+				Usage = ResourceUsage.Dynamic,
+				BindFlags = BindFlags.ConstantBuffer,
+				SizeInBytes = psConstantBufferBytes,
+				CpuAccessFlags = CpuAccessFlags.Write,
+				StructureByteStride = 0,
+				OptionFlags = 0,
+			};
+			psConstantBuffer = new D3D11.Buffer(device,psConstantBufferDesc);
 		}
 
-		public void fromFiles(string vsFilename,string psFilename) {
-			using(var vertexShaderByteCode = ShaderBytecode.CompileFromFile(vsFilename,"main","vs_4_0",ShaderFlags.Debug)) {
+		protected void fromFiles(string vsFilename,string psFilename) {
+			using(var vertexShaderByteCode = ShaderBytecode.CompileFromFile("Shaders/"+vsFilename,"main","vs_4_0",ShaderFlags.Debug)) {
 				vertexShader = new D3D11.VertexShader(device,vertexShaderByteCode);
 				inputSignature = ShaderSignature.GetInputSignature(vertexShaderByteCode);
 			}
-			using(var pixelShaderByteCode = ShaderBytecode.CompileFromFile(psFilename,"main","ps_4_0",ShaderFlags.Debug)) {
+			using(var pixelShaderByteCode = ShaderBytecode.CompileFromFile("Shaders/"+psFilename,"main","ps_4_0",ShaderFlags.Debug)) {
 				pixelShader = new D3D11.PixelShader(device,pixelShaderByteCode);
 			}
 			
 		}
 
-		public void setInputElements(D3D11.InputElement[] elements) {
+		protected void setInputElements(D3D11.InputElement[] elements) {
 			inputLayout = new D3D11.InputLayout(device,inputSignature,elements);
 		}
 
-		public void updateUniforms<T>(T values) where T : struct {
+		public void updateVSConstantBuffer<T>(T values) where T : struct {
 			SharpDX.DataStream dataStream;
-			context.MapSubresource(uniformBuffer,MapMode.WriteDiscard,MapFlags.None,out dataStream);
+			context.MapSubresource(vsConstantBuffer,MapMode.WriteDiscard,MapFlags.None,out dataStream);
 			dataStream.Write<T>(values);
-			context.UnmapSubresource(uniformBuffer,0);
+			context.UnmapSubresource(vsConstantBuffer,0);
 		}
 
-		public void updateUniforms(float[] values) {
+		public void updateVSConstantBuffer(float[] values) {
 			SharpDX.DataStream dataStream;
-			context.MapSubresource(uniformBuffer,MapMode.WriteDiscard,MapFlags.None,out dataStream);
-			for(int i=0;i<16;i++)
+			context.MapSubresource(vsConstantBuffer,MapMode.WriteDiscard,MapFlags.None,out dataStream);
+			for(int i=0;i<values.Length;i++)
 				dataStream.Write(values[i]);
-			context.UnmapSubresource(uniformBuffer,0);
+			context.UnmapSubresource(vsConstantBuffer,0);
+		}
+
+		public void updatePSConstantBuffer<T>(T values) where T : struct {
+			SharpDX.DataStream dataStream;
+			context.MapSubresource(psConstantBuffer,MapMode.WriteDiscard,MapFlags.None,out dataStream);
+			dataStream.Write<T>(values);
+			context.UnmapSubresource(psConstantBuffer,0);
+		}
+
+		public void updatePSConstantBuffer(float[] values) {
+			SharpDX.DataStream dataStream;
+			context.MapSubresource(psConstantBuffer,MapMode.WriteDiscard,MapFlags.None,out dataStream);
+			for(int i = 0; i<values.Length; i++)
+				dataStream.Write(values[i]);
+			context.UnmapSubresource(psConstantBuffer,0);
 		}
 
 		public void activate() {
 			context.VertexShader.Set(vertexShader);
 			context.PixelShader.Set(pixelShader);
-			context.VertexShader.SetConstantBuffer(0,uniformBuffer);
+			context.VertexShader.SetConstantBuffer(0,vsConstantBuffer);
+			context.PixelShader.SetConstantBuffer(0,psConstantBuffer);
 			context.InputAssembler.InputLayout = inputLayout;
 		}
 

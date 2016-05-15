@@ -17,12 +17,9 @@ using SharpGraphics;
 
 using RoomAliveToolkit;
 using System.Runtime.InteropServices;
+using RoomAliveTestApp.Shaders;
 
 namespace RoomAliveTestApp {
-
-	struct SingleColorUniforms {
-		public float[] mvp;
-	}
 
 	class TestApp : ApplicationContext, IDisposable, InputCallbacks {
 
@@ -32,11 +29,9 @@ namespace RoomAliveTestApp {
 
 		//Triangle members
 		private Vector3[] vertices = new Vector3[] { new Vector3(-0.5f,0.5f,0.0f),new Vector3(0.5f,0.5f,0.0f),new Vector3(0.0f,-0.5f,0.0f) };
-		private D3D11.InputElement[] inputElements = new D3D11.InputElement[] { new D3D11.InputElement("POSITION", 0, Format.R32G32B32_Float, 0) };
 		private D3D11.Buffer triangleVertexBuffer;
 		private D3D11.VertexBufferBinding binding;
-		private ShaderBase singleColorShader;
-		private SingleColorUniforms uniformVals = new SingleColorUniforms();
+		private SingleColorShader singleColorShader;
 		private float[] mvp = new float[16];
 
 		//RoomAlive objects
@@ -69,16 +64,11 @@ namespace RoomAliveTestApp {
 			triangleVertexBuffer = D3D11.Buffer.Create<Vector3>(device,D3D11.BindFlags.VertexBuffer,vertices);
 			binding = new D3D11.VertexBufferBinding(triangleVertexBuffer,Utilities.SizeOf<Vector3>(),0);
 
-			singleColorShader = new ShaderBase(device,16*sizeof(float));
-			singleColorShader.fromFiles("vertexShader.hlsl","pixelShader.hlsl");
-			singleColorShader.setInputElements(inputElements);
-			
-			context.Rasterizer.SetViewport(new Viewport(0,0,surface.width,surface.height));
+			singleColorShader = new SingleColorShader(device);
 
 			//----Init-RoomAlive----
 
 			ensemble = RoomAliveToolkit.ProjectorCameraEnsemble.FromFile("C:/Users/Progga/Documents/Visual Studio 2015/Projects/RoomAliveToolkit/calibration/single_projector4/calibration4.xml");
-
 
 			//----Start-----
 
@@ -89,7 +79,8 @@ namespace RoomAliveTestApp {
 			singleColorShader.activate();
 			SharpDX.Matrix mvpMat = surface.getProjectionMatrix();
 			mvp = mvpMat.ToArray();
-			singleColorShader.updateUniforms(mvp);
+			singleColorShader.updateVSConstantBuffer(mvp);
+			singleColorShader.passColor(1,0.5f,0,1);
 			context.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
 			context.InputAssembler.SetVertexBuffers(0,binding);
 			context.Draw(vertices.Count(),0);
