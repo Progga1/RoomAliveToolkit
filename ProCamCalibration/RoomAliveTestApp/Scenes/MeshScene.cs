@@ -12,11 +12,16 @@ namespace RoomAliveTestApp.Scenes {
 
 	class MeshScene : Scene {
 
-		RoomMesh mesh;
+		Mesh mesh;
+		MeshShader meshShader;
+		ImagingFactory2 imagingFactory = new ImagingFactory2();
+		MeshDeviceResources meshDeviceResources;
 		private CameraControl cameraControl = new CameraControl();
 
 		protected override void PostInit() {
-			mesh = loadObj("Assets/FloorPlan.obj");
+			mesh = Mesh.FromOBJFile("Assets/FloorPlan.obj");
+			meshShader = new MeshShader(device);
+			meshDeviceResources = new MeshDeviceResources(device,imagingFactory,mesh);
 			surface.setDepthEnabled(true);
 		}
 
@@ -37,8 +42,8 @@ namespace RoomAliveTestApp.Scenes {
 						viewMat.Transpose();
 			SharpDX.Matrix projViewMat = (projMat*viewMat);
 			projViewMat.Transpose();
-			mesh.meshShader.SetVertexShaderConstants(context,world,viewMat*projMat,pointLight.position);
-			mesh.meshShader.Render(context,mesh.meshDeviceResources,pointLight,null,null,surface.viewport);
+			meshShader.SetVertexShaderConstants(context,world,viewMat*projMat,pointLight.position);
+			meshShader.Render(context,meshDeviceResources,pointLight,null,null,surface.viewport);
 		}
 
 		public override void RawEvent(InputEvent ev) {

@@ -97,7 +97,7 @@ namespace RoomAliveToolkit
                         vertex.position = positions[int.Parse(indices[0]) - 1]; // OBJ indices are 1-based    
                         if (indices.Length>1 && indices[1] != "") // optional texture coords
                             vertex.texture = textureCoords[int.Parse(indices[1]) - 1];
-                        if (indices.Length>3 && indices[2] != "") // optional normal
+                        if (indices.Length>2 && indices[2] != "") // optional normal
                             vertex.normal = normals[int.Parse(indices[2]) - 1];
                         vertices.Add(vertex);
                         subset.length++;
