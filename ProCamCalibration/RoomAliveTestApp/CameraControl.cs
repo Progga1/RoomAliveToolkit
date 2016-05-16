@@ -49,8 +49,8 @@ namespace SharpGraphics {
 				position -= new Vector3(right.X,right.Y,right.Z)*ev.dx;
 				position -= new Vector3(up.X,up.Y,up.Z)*ev.dy;
 
-				Console.WriteLine("Right: "+right);
-				Console.WriteLine("POS: "+position);
+//				Console.WriteLine("Right: "+right);
+//				Console.WriteLine("POS: "+position);
 			}
 			
 		}

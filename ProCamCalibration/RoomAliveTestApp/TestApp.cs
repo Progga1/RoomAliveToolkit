@@ -26,13 +26,7 @@ namespace RoomAliveTestApp {
 	class TestApp : ApplicationContext, IDisposable, InputCallbacks {
 
 		RenderSurface mainSurface;
-		RenderSurface meshSurface;
-
-
-		private D3D11.Buffer quadVertexBuffer;
-		private D3D11.VertexBufferBinding quadBinding;
-		private SingleColorShader singleColorShader2;
-		private CameraControl cameraControl = new CameraControl();
+		RenderSurface quadSurface;
 
 		private Scene triangleScene;
 		private Scene quadScene;
@@ -68,17 +62,14 @@ namespace RoomAliveTestApp {
 			})).Start();
 
 			new Thread(new ThreadStart(() => {
-				meshSurface = new RenderSurface(RenderCallback);
-				meshSurface.setInputCallback(this);
-				meshSurface.clearColor = new Color(45,45,45);
-				meshSurface.initWindowed("Mesh",640,480);
-				meshSurface.setOrthographicProjection(1,0,10);
+				quadSurface = new RenderSurface(RenderCallback);
+				quadSurface.setInputCallback(this);
+				quadSurface.clearColor = new Color(45,45,45);
+				quadSurface.initWindowed("Quad",640,480);
 
-				quadVertexBuffer = D3D11.Buffer.Create<Vector3>(meshSurface.device,D3D11.BindFlags.VertexBuffer,DefaultMeshes.quadVertices);
-				quadBinding = new D3D11.VertexBufferBinding(quadVertexBuffer,Utilities.SizeOf<Vector3>(),0);
-				singleColorShader2 = new SingleColorShader(meshSurface.device);
+				quadScene.Init(quadSurface);
 
-				meshSurface.run();
+				quadSurface.run();
 			})).Start();
 
 
@@ -88,34 +79,25 @@ namespace RoomAliveTestApp {
 			if(sender==mainSurface) {
 				triangleScene.OnDraw();
 			}
-			if(sender==meshSurface) {
-				SharpDX.Matrix viewMat = cameraControl.getViewMatrix();
-				meshSurface.setOrthographicProjection(cameraControl.distance,-1,100);
-//				meshSurface.setPerspectiveProjection(1.4f,0.01f,10);
-				viewMat.Transpose();
-
-				SharpDX.Matrix projMat = meshSurface.getProjectionMatrix();
-				projMat.Transpose();
-				SharpDX.Matrix mvpMat = SharpDX.Matrix.Multiply(projMat,viewMat);
-				float[] mvp = mvpMat.ToArray();
-				context.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleStrip;
-				singleColorShader2.activate();
-				singleColorShader2.updateVSConstantBuffer(mvp);
-				singleColorShader2.passColor(1,0,0,1);
-				context.InputAssembler.SetVertexBuffers(0,quadBinding);
-				context.Draw(4,0);
+			if(sender==quadSurface) {
+				quadScene.OnDraw();
 			}
 		}
 
 		public new void Dispose() {
 			mainSurface.Dispose();
-			meshSurface.Dispose();
+			quadSurface.Dispose();
 			triangleScene.Dispose();
 			quadScene.Dispose();
 		}
 
 		public void RawEvent(InputEvent ev) {
-
+			if(ev.sender==mainSurface) {
+				ev.handle(triangleScene);
+			}
+			if(ev.sender==quadSurface) {
+				ev.handle(quadScene);
+			}
 		}
 
 		public void MouseDown(NormMouseEvent mouseEvent) {
@@ -127,12 +109,7 @@ namespace RoomAliveTestApp {
 		}
 
 		public void MouseDrag(NormMouseEvent mouseEvent) {
-			if(mouseEvent.sender==mainSurface) {
-				triangleScene.MouseDrag(mouseEvent);
-			}
-			if(mouseEvent.sender==meshSurface) {
-				cameraControl.MouseDrag(mouseEvent);
-			}
+
 		}
 
 		public void MouseUp(NormMouseEvent mouseEvent) {

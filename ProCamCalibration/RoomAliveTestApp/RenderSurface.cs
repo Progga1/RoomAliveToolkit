@@ -150,18 +150,18 @@ namespace SharpGraphics {
 			lstY = pixelToNormY(ev.Y);
 			mouseDragButton = ev.Button;
 			if(inputCallbacks!=null) {
-				CreateMouseEvent(NormMouseEvent.ACTION_MOUSEDOWN,ev);
+				CreateMouseEvent(NormMouseEvent.ACTION_MOUSEDOWN,ev).handle(inputCallbacks);
 			}
 		}
 
 		public void MouseMove(object sender,MouseEventArgs ev) {
 			if(inputCallbacks!=null) {
 				if(mouseDragButton==MouseButtons.None)
-					inputCallbacks.MouseMove(CreateMouseEvent(NormMouseEvent.ACTION_MOUSEMOVE,ev));
+					CreateMouseEvent(NormMouseEvent.ACTION_MOUSEMOVE,ev).handle(inputCallbacks);
 				else {
 					NormMouseEvent nEv = CreateMouseEvent(NormMouseEvent.ACTION_MOUSEDRAG,ev);
 					nEv.button = mouseDragButton;
-					inputCallbacks.MouseDrag(nEv);
+					nEv.handle(inputCallbacks);
 				}
 			}
 		}
@@ -169,7 +169,7 @@ namespace SharpGraphics {
 		public void MouseUp(object sender,MouseEventArgs ev) {
 			mouseDragButton = MouseButtons.None;
 			if(inputCallbacks!=null) {
-				inputCallbacks.MouseUp(CreateMouseEvent(NormMouseEvent.ACTION_MOUSEUP,ev));
+				CreateMouseEvent(NormMouseEvent.ACTION_MOUSEUP,ev).handle(inputCallbacks);
 			}
 		}
 
@@ -178,7 +178,7 @@ namespace SharpGraphics {
 				mouseWheelEvent.handled = false;
 				mouseWheelEvent.sender = this;
 				mouseWheelEvent.amount = ev.Delta>0 ? 1 : -1;
-				inputCallbacks.MouseWheel(mouseWheelEvent);
+				mouseWheelEvent.handle(inputCallbacks);
 			}
 		}
 
@@ -192,13 +192,13 @@ namespace SharpGraphics {
 
 		public void KeyDown(object sender,KeyEventArgs ev) {
 			if(inputCallbacks!=null) {
-				inputCallbacks.KeyDown(createKeyEvent(KeyEvent.ACTION_KEYDOWN,ev));
+				createKeyEvent(KeyEvent.ACTION_KEYDOWN,ev).handle(inputCallbacks);
 			}
 		}
 
 		public void KeyUp(object sender,KeyEventArgs ev) {
 			if(inputCallbacks!=null) {
-				inputCallbacks.KeyUp(createKeyEvent(KeyEvent.ACTION_KEYUP,ev));
+				createKeyEvent(KeyEvent.ACTION_KEYUP,ev).handle(inputCallbacks);
 			}
 		}
 
