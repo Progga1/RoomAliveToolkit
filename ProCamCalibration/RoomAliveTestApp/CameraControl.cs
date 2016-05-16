@@ -16,6 +16,8 @@ namespace SharpGraphics {
 		private Matrix viewTransf;
 		private Matrix viewTransfTransp;
 
+		public bool transposed = false;
+
 		public Vector3 position;
 		public float alpha = 0.0f, beta = 0.0f, distance = 1;
 
@@ -99,9 +101,14 @@ namespace SharpGraphics {
 				 )*distance + position;
 			Vector3 up = Vector3.Up;
 			Matrix.LookAtRH(ref eye,ref position,ref up, out viewTransf);
-			viewTransfTransp = viewTransf;
-			viewTransfTransp.Transpose();
-			return viewTransfTransp;
+			if(transposed) {
+				viewTransfTransp = viewTransf;
+				viewTransfTransp.Transpose();
+				return viewTransfTransp;
+			} else {
+				return viewTransf;
+			}
+			
 		}
 	}
 

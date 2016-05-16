@@ -13,6 +13,8 @@ namespace RoomAliveTestApp {
 
 	class RoomMesh {
 
+		public bool flipTexY = false;
+
 		protected D3DDevice device;
 		protected D3DDeviceContext context;
 
@@ -27,7 +29,9 @@ namespace RoomAliveTestApp {
 		}
 
 		public void loadObj(string filename) {
-			Mesh mesh = Mesh.FromOBJFile(filename);
+			var mesh = new Mesh();
+			mesh.flipTexY = flipTexY;
+			mesh.LoadFromOBJFile(filename);
 			meshShader = new MeshShader(device);
 			meshDeviceResources = new MeshDeviceResources(device,imagingFactory,mesh);
 		}

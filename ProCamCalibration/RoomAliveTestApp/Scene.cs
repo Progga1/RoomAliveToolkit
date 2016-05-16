@@ -1,5 +1,6 @@
 using RoomAliveTestApp;
 using RoomAliveToolkit;
+using SharpDX;
 using SharpDX.WIC;
 using System;
 using System.Collections.Generic;
@@ -18,6 +19,7 @@ namespace SharpGraphics {
 		protected RenderSurface surface;
 		protected D3DDevice device;
 		protected D3DDeviceContext context;
+		protected PointLight pointLight = new PointLight();
 
 		protected abstract void PostInit();
 
@@ -25,13 +27,20 @@ namespace SharpGraphics {
 			this.surface = surface;
 			this.device = surface.device;
 			this.context = surface.context;
+			pointLight.position = new Vector3(0,2,0);
+			pointLight.Ia = new Vector3(0.1f,0.1f,0.1f);
 			PostInit();
 		}
 
-		public RoomMesh loadObj(string filename) {
+		public RoomMesh loadObj(string filename,bool flipTexY) {
 			RoomMesh mesh = new RoomMesh(device);
+			mesh.flipTexY = flipTexY;
 			mesh.loadObj(filename);
 			return mesh;
+		}
+
+		public RoomMesh loadObj(string filename) {
+			return loadObj(filename,false);
 		}
 
 		public virtual void OnDraw() {

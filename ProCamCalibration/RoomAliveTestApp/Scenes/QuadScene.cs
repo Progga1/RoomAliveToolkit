@@ -33,6 +33,7 @@ namespace RoomAliveTestApp.Scenes {
 			cubeBinding = new D3D11.VertexBufferBinding(cubeVertexBuffer,Utilities.SizeOf<Vector3>(),0);
 			cubeIndexBuffer = D3D11.Buffer.Create<int>(device,D3D11.BindFlags.IndexBuffer,DefaultMeshes.cubeIndices);
 
+			cameraControl.transposed = true;
 			singleColorShader = new SingleColorShader(device);
 		}
 
