@@ -37,6 +37,7 @@ namespace SharpGraphics {
 		//SharpDX objects
 		public D3DDevice device;
 		public D3DDeviceContext context;
+		public DepthStencilView depthStencilView;
 		public SwapChain swapChain;
 		public RenderForm renderForm { get; private set; }
 		public D3D11.RenderTargetView renderTargetView { get; private set; }
@@ -83,6 +84,30 @@ namespace SharpGraphics {
 
 			context.OutputMerger.SetRenderTargets(renderTargetView);
 			context.Rasterizer.SetViewport(new Viewport(0,0,width,height));
+
+			//--Init-depth--
+			var zBufferTextureDescription = new D3D11.Texture2DDescription {
+				Format = Format.D16_UNorm,
+				ArraySize = 1,
+				MipLevels = 1,
+				Width = getWidth(),
+				Height = getHeight(),
+				SampleDescription = new SampleDescription(1,0),
+				Usage = D3D11.ResourceUsage.Default,
+				BindFlags = D3D11.BindFlags.DepthStencil,
+				CpuAccessFlags = D3D11.CpuAccessFlags.None,
+				OptionFlags = D3D11.ResourceOptionFlags.None
+			};
+			using(var zBufferTexture = new Texture2D(device,zBufferTextureDescription))
+				depthStencilView = new DepthStencilView(device,zBufferTexture);
+			var depthStencilDesc = new D3D11.DepthStencilStateDescription {
+				DepthWriteMask = DepthWriteMask.All,
+				DepthComparison = Comparison.Less,
+				IsDepthEnabled = true
+			};
+
+			context.OutputMerger.SetDepthStencilState(new DepthStencilState(device,depthStencilDesc));
+			context.OutputMerger.SetTargets(depthStencilView,renderTargetView);
 		}
 
 		public void setOrthographicProjection(float zoom,float near,float far) {
@@ -107,6 +132,7 @@ namespace SharpGraphics {
 
 		private void RenderCallback() {
 			context.ClearRenderTargetView(renderTargetView,clearColor);
+			context.ClearDepthStencilView(depthStencilView,DepthStencilClearFlags.Depth,1,0);
 			OnDraw(context,this);
 			swapChain.Present(1,PresentFlags.None);
 		}
@@ -115,20 +141,20 @@ namespace SharpGraphics {
 			RenderLoop.Run(renderForm,RenderCallback);
 		}
 
-		public void Dispose() {
-			device.Dispose();
-			context.Dispose();
-			renderForm.Dispose();
-			renderTargetView.Dispose();
-			swapChain.Dispose();
-		}
-
 		public float pixelToNormX(int pixelX) {
 			return ((float)pixelX/width*2-1)*ratioX;
 		}
 
 		public float pixelToNormY(int pixelY) {
 			return -(float)pixelY/height*2+1;
+		}
+
+		public int getWidth() {
+			return width;
+		}
+
+		public int getHeight() {
+			return height;
 		}
 
 		private NormMouseEvent CreateMouseEvent(int action,MouseEventArgs ev) {
@@ -200,6 +226,14 @@ namespace SharpGraphics {
 			if(inputCallbacks!=null) {
 				createKeyEvent(KeyEvent.ACTION_KEYUP,ev).handle(inputCallbacks);
 			}
+		}
+
+		public void Dispose() {
+			device.Dispose();
+			context.Dispose();
+			renderForm.Dispose();
+			renderTargetView.Dispose();
+			swapChain.Dispose();
 		}
 
 	}

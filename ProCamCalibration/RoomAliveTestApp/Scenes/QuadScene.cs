@@ -1,6 +1,7 @@
 using RoomAliveTestApp.Shaders;
 using SharpDX;
 using SharpDX.Direct3D;
+using SharpDX.DXGI;
 using SharpGraphics;
 using System;
 using System.Collections.Generic;
