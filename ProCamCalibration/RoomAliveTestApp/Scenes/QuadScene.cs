@@ -18,13 +18,21 @@ namespace RoomAliveTestApp.Scenes {
 
 		private D3D11.Buffer quadVertexBuffer;
 		private D3D11.VertexBufferBinding quadBinding;
-		private SingleColorShader singleColorShader2;
+		private SingleColorShader singleColorShader;
+		private D3D11.Buffer cubeVertexBuffer;
+		private D3D11.VertexBufferBinding cubeBinding;
+		private D3D11.Buffer cubeIndexBuffer;
 		private CameraControl cameraControl = new CameraControl();
 
 		protected override void PostInit() {
 			quadVertexBuffer = D3D11.Buffer.Create<Vector3>(device,D3D11.BindFlags.VertexBuffer,DefaultMeshes.quadVertices);
 			quadBinding = new D3D11.VertexBufferBinding(quadVertexBuffer,Utilities.SizeOf<Vector3>(),0);
-			singleColorShader2 = new SingleColorShader(device);
+
+			cubeVertexBuffer = D3D11.Buffer.Create<Vector3>(device,D3D11.BindFlags.VertexBuffer,DefaultMeshes.centerCubeVertices);
+			cubeBinding = new D3D11.VertexBufferBinding(cubeVertexBuffer,Utilities.SizeOf<Vector3>(),0);
+			cubeIndexBuffer = D3D11.Buffer.Create<int>(device,D3D11.BindFlags.IndexBuffer,DefaultMeshes.cubeIndices);
+
+			singleColorShader = new SingleColorShader(device);
 		}
 
 		public override void OnDraw() {
@@ -38,12 +46,19 @@ namespace RoomAliveTestApp.Scenes {
 			projMat.Transpose();
 			SharpDX.Matrix mvpMat = SharpDX.Matrix.Multiply(projMat,viewMat);
 			float[] mvp = mvpMat.ToArray();
+			singleColorShader.activate();
+			singleColorShader.updateVSConstantBuffer(mvp);
+
+			singleColorShader.passColor(1,0,0,1);
 			context.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleStrip;
-			singleColorShader2.activate();
-			singleColorShader2.updateVSConstantBuffer(mvp);
-			singleColorShader2.passColor(1,0,0,1);
 			context.InputAssembler.SetVertexBuffers(0,quadBinding);
 			context.Draw(4,0);
+
+			singleColorShader.passColor(1,1,0,1);
+			context.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
+			context.InputAssembler.SetVertexBuffers(0,cubeBinding);
+			context.InputAssembler.SetIndexBuffer(cubeIndexBuffer,SharpDX.DXGI.Format.R32_UInt,0);
+			context.DrawIndexed(DefaultMeshes.cubeIndices.Length,0,0);
 		}
 
 		public override void RawEvent(InputEvent ev) {
