@@ -1,3 +1,6 @@
+using RoomAliveTestApp;
+using RoomAliveToolkit;
+using SharpDX.WIC;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,8 +28,18 @@ namespace SharpGraphics {
 			PostInit();
 		}
 
+		public RoomMesh loadObj(string filename) {
+			RoomMesh mesh = new RoomMesh(device);
+			mesh.loadObj(filename);
+			return mesh;
+		}
+
 		public virtual void OnDraw() {
 
+		}
+
+		public void RenderCallback(D3DDeviceContext context,RenderSurface sender) {
+			OnDraw();
 		}
 
 		public virtual void RawEvent(InputEvent ev) {

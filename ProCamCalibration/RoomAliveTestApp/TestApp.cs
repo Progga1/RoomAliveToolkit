@@ -25,16 +25,13 @@ namespace RoomAliveTestApp {
 
 	class TestApp : ApplicationContext, IDisposable, InputCallbacks {
 
-		RenderSurface mainSurface;
+		RenderSurface triangleSurface;
 		RenderSurface quadSurface;
 		RenderSurface meshSurface;
 
 		private Scene triangleScene;
 		private Scene quadScene;
 		private Scene meshScene;
-
-		//RoomAlive objects
-		private ProjectorCameraEnsemble ensemble;
 
 
 		[STAThread]
@@ -48,17 +45,15 @@ namespace RoomAliveTestApp {
 
 		public TestApp() {
 
-			ensemble = RoomAliveToolkit.ProjectorCameraEnsemble.FromFile("C:/Users/Progga/Documents/Visual Studio 2015/Projects/RoomAliveToolkit/calibration/single_projector4/calibration4.xml");
-
 			new Thread(new ThreadStart(() => {
-				mainSurface = new RenderSurface(RenderCallback);
-				mainSurface.setInputCallback(this);
-				mainSurface.initWindowed("Triangle",640,480);
+				triangleSurface = new RenderSurface(RenderCallback);
+				triangleSurface.setInputCallback(this);
+				triangleSurface.initWindowed("Triangle",640,480);
 
 				triangleScene = new TriangleScene();
-				triangleScene.Init(mainSurface);
+				triangleScene.Init(triangleSurface);
 
-				mainSurface.run();
+				triangleSurface.run();
 			})).Start();
 
 			new Thread(new ThreadStart(() => {
@@ -89,7 +84,7 @@ namespace RoomAliveTestApp {
 		}
 
 		private void RenderCallback(D3DDeviceContext context,RenderSurface sender) {
-			if(sender==mainSurface)
+			if(sender==triangleSurface)
 				triangleScene.OnDraw();
 			if(sender==quadSurface)
 				quadScene.OnDraw();
@@ -98,7 +93,8 @@ namespace RoomAliveTestApp {
 		}
 
 		public new void Dispose() {
-			mainSurface.Dispose();
+			base.Dispose();
+			triangleSurface.Dispose();
 			quadSurface.Dispose();
 			triangleScene.Dispose();
 			quadScene.Dispose();
@@ -106,7 +102,7 @@ namespace RoomAliveTestApp {
 		}
 
 		public void RawEvent(InputEvent ev) {
-			if(ev.sender==mainSurface)
+			if(ev.sender==triangleSurface)
 				ev.handle(triangleScene);
 			if(ev.sender==quadSurface)
 				ev.handle(quadScene);
