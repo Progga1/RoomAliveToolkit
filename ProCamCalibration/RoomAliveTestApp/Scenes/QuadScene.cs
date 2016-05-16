@@ -66,5 +66,9 @@ namespace RoomAliveTestApp.Scenes {
 			ev.handle(cameraControl);
 		}
 
+		public override void Dispose() {
+			singleColorShader.Dispose();
+		}
+
 	}
 }

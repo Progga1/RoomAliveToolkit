@@ -68,6 +68,7 @@
     <Compile Include="InputCallbacks.cs" />
     <Compile Include="RenderSurface.cs" />
     <Compile Include="Scene.cs" />
+    <Compile Include="Scenes\MeshScene.cs" />
     <Compile Include="Scenes\QuadScene.cs" />
     <Compile Include="Scenes\TriangleScene.cs" />
     <Compile Include="ShaderBase.cs" />

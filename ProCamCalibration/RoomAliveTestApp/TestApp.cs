@@ -27,9 +27,11 @@ namespace RoomAliveTestApp {
 
 		RenderSurface mainSurface;
 		RenderSurface quadSurface;
+		RenderSurface meshSurface;
 
 		private Scene triangleScene;
 		private Scene quadScene;
+		private Scene meshScene;
 
 		//RoomAlive objects
 		private ProjectorCameraEnsemble ensemble;
@@ -48,14 +50,15 @@ namespace RoomAliveTestApp {
 
 			ensemble = RoomAliveToolkit.ProjectorCameraEnsemble.FromFile("C:/Users/Progga/Documents/Visual Studio 2015/Projects/RoomAliveToolkit/calibration/single_projector4/calibration4.xml");
 
-			triangleScene = new TriangleScene();
-			quadScene = new QuadScene();
+			
+			
 
 			new Thread(new ThreadStart(() => {
 				mainSurface = new RenderSurface(RenderCallback);
 				mainSurface.setInputCallback(this);
 				mainSurface.initWindowed("Triangle",640,480);
 
+				triangleScene = new TriangleScene();
 				triangleScene.Init(mainSurface);
 
 				mainSurface.run();
@@ -67,21 +70,34 @@ namespace RoomAliveTestApp {
 				quadSurface.clearColor = new Color(45,45,45);
 				quadSurface.initWindowed("Quad",640,480);
 
+				quadScene = new QuadScene();
 				quadScene.Init(quadSurface);
 
 				quadSurface.run();
+			})).Start();
+
+			new Thread(new ThreadStart(() => {
+				meshSurface = new RenderSurface(RenderCallback);
+				meshSurface.setInputCallback(this);
+				meshSurface.clearColor = new Color(45,45,45);
+				meshSurface.initWindowed("Mesh",800,600);
+
+				meshScene = new MeshScene();
+				meshScene.Init(meshSurface);
+
+				meshSurface.run();
 			})).Start();
 
 
 		}
 
 		private void RenderCallback(D3DDeviceContext context,RenderSurface sender) {
-			if(sender==mainSurface) {
+			if(sender==mainSurface)
 				triangleScene.OnDraw();
-			}
-			if(sender==quadSurface) {
+			if(sender==quadSurface)
 				quadScene.OnDraw();
-			}
+			if(sender==meshSurface)
+				meshScene.OnDraw();
 		}
 
 		public new void Dispose() {
@@ -89,15 +105,16 @@ namespace RoomAliveTestApp {
 			quadSurface.Dispose();
 			triangleScene.Dispose();
 			quadScene.Dispose();
+			meshScene.Dispose();
 		}
 
 		public void RawEvent(InputEvent ev) {
-			if(ev.sender==mainSurface) {
+			if(ev.sender==mainSurface)
 				ev.handle(triangleScene);
-			}
-			if(ev.sender==quadSurface) {
+			if(ev.sender==quadSurface)
 				ev.handle(quadScene);
-			}
+			if(ev.sender==meshSurface)
+				ev.handle(meshScene);
 		}
 
 		public void MouseDown(NormMouseEvent mouseEvent) {

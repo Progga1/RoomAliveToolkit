@@ -39,6 +39,8 @@ namespace SharpGraphics {
 		public D3DDeviceContext context;
 		public DepthStencilView depthStencilView;
 		public SwapChain swapChain;
+		public DepthStencilState depthEnabledState;
+		public DepthStencilState depthDisabledState;
 		public RenderForm renderForm { get; private set; }
 		public D3D11.RenderTargetView renderTargetView { get; private set; }
 
@@ -105,8 +107,9 @@ namespace SharpGraphics {
 				DepthComparison = Comparison.Less,
 				IsDepthEnabled = true
 			};
-
-			context.OutputMerger.SetDepthStencilState(new DepthStencilState(device,depthStencilDesc));
+			depthEnabledState = new DepthStencilState(device,depthStencilDesc);
+			depthDisabledState = new DepthStencilState(device,new D3D11.DepthStencilStateDescription { });
+			setDepthEnabled(true);
 			context.OutputMerger.SetTargets(depthStencilView,renderTargetView);
 		}
 
@@ -124,6 +127,10 @@ namespace SharpGraphics {
 
 		public Matrix getProjectionMatrix() {
 			return projMat;
+		}
+
+		public void setDepthEnabled(bool enabled) {
+			context.OutputMerger.SetDepthStencilState(enabled?depthEnabledState:depthDisabledState);
 		}
 
 		public void setInputCallback(InputCallbacks callbacks) {
