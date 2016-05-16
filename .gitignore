@@ -8,6 +8,7 @@
 *.sln.docstates
 *.lnk
 calibration/*
+ProCamCalibration/RoomAliveTestApp/Assets/*
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs

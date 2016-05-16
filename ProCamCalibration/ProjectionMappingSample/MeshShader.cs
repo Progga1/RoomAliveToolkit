@@ -285,14 +285,16 @@ namespace RoomAliveToolkit
             deviceContext.InputAssembler.PrimitiveTopology = SharpDX.Direct3D.PrimitiveTopology.TriangleList;
             deviceContext.InputAssembler.SetVertexBuffers(0, meshDeviceResources.vertexBufferBinding);
             deviceContext.Rasterizer.State = rasterizerState;
-            deviceContext.Rasterizer.SetViewport(viewport);
+			if(viewport!=null)
+				deviceContext.Rasterizer.SetViewport(viewport);
             deviceContext.VertexShader.Set(meshVS);
             deviceContext.VertexShader.SetConstantBuffer(0, vertexShaderConstantBuffer);
             deviceContext.GeometryShader.Set(null);
             deviceContext.PixelShader.Set(meshPS);
             deviceContext.PixelShader.SetSampler(0, colorSamplerState);
             deviceContext.PixelShader.SetConstantBuffer(0, pixelShaderConstantBuffer);
-            deviceContext.OutputMerger.SetTargets(depthStencilView, renderTargetView);
+			if(depthStencilView!=null && renderTargetView!=null)
+				deviceContext.OutputMerger.SetTargets(depthStencilView, renderTargetView);
             deviceContext.OutputMerger.DepthStencilState = depthStencilState;
 
             foreach (var subset in meshDeviceResources.mesh.subsets)

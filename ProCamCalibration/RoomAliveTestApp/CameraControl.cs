@@ -14,9 +14,12 @@ namespace SharpGraphics {
 		const float PI = 3.14159265f;
 
 		private Matrix viewTransf;
+		private Matrix viewTransfTransp;
 
 		public Vector3 position;
 		public float alpha = 0.0f, beta = 0.0f, distance = 1;
+
+		public float maxBeta = PI/2-0.001f;
 
 		private bool shiftDown = false;
 
@@ -24,6 +27,19 @@ namespace SharpGraphics {
 
 		public CameraControl() {
 
+		}
+
+		protected void applyConstraints() {
+			while(alpha>2*PI)
+				alpha -= 2*PI;
+			while(alpha<0)
+				alpha += 2*PI;
+			if(beta>maxBeta)
+				beta = maxBeta;
+			if(beta<-maxBeta)
+				beta = -maxBeta;
+			if(distance<0.01f)
+				distance = 0.01f;
 		}
 
 		public void RawEvent(InputEvent ev) {
@@ -42,6 +58,7 @@ namespace SharpGraphics {
 			if(!shiftDown) {
 				alpha -= ev.dx;
 				beta -= ev.dy;
+				applyConstraints();
 			} else {
 				getViewMatrix();
 				Vector4 right = viewTransf.Column1;
@@ -61,6 +78,7 @@ namespace SharpGraphics {
 
 		public void MouseWheel(MouseWheelEvent ev) {
 			distance -= ev.amount*distanceFac;
+			applyConstraints();
 		}
 
 		public void KeyDown(KeyEvent ev) {
@@ -81,8 +99,9 @@ namespace SharpGraphics {
 				 )*distance + position;
 			Vector3 up = Vector3.Up;
 			Matrix.LookAtRH(ref eye,ref position,ref up, out viewTransf);
-//			viewTransf.Invert();
-			return viewTransf;
+			viewTransfTransp = viewTransf;
+			viewTransfTransp.Transpose();
+			return viewTransfTransp;
 		}
 	}
 

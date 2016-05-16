@@ -50,9 +50,6 @@ namespace RoomAliveTestApp {
 
 			ensemble = RoomAliveToolkit.ProjectorCameraEnsemble.FromFile("C:/Users/Progga/Documents/Visual Studio 2015/Projects/RoomAliveToolkit/calibration/single_projector4/calibration4.xml");
 
-			
-			
-
 			new Thread(new ThreadStart(() => {
 				mainSurface = new RenderSurface(RenderCallback);
 				mainSurface.setInputCallback(this);

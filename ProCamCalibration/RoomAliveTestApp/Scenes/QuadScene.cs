@@ -40,8 +40,7 @@ namespace RoomAliveTestApp.Scenes {
 			base.OnDraw();
 			SharpDX.Matrix viewMat = cameraControl.getViewMatrix();
 			surface.setOrthographicProjection(cameraControl.distance,-1,100);
-			//				meshSurface.setPerspectiveProjection(1.4f,0.01f,10);
-			viewMat.Transpose();
+			surface.setPerspectiveProjection(1.4f,0.01f,10);
 
 			SharpDX.Matrix projMat = surface.getProjectionMatrix();
 			projMat.Transpose();

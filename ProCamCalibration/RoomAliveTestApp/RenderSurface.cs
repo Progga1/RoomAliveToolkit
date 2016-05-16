@@ -41,6 +41,7 @@ namespace SharpGraphics {
 		public SwapChain swapChain;
 		public DepthStencilState depthEnabledState;
 		public DepthStencilState depthDisabledState;
+		public Viewport viewport { get; private set; }
 		public RenderForm renderForm { get; private set; }
 		public D3D11.RenderTargetView renderTargetView { get; private set; }
 
@@ -85,7 +86,8 @@ namespace SharpGraphics {
 			}
 
 			context.OutputMerger.SetRenderTargets(renderTargetView);
-			context.Rasterizer.SetViewport(new Viewport(0,0,width,height));
+			viewport = new Viewport(0,0,width,height);
+			context.Rasterizer.SetViewport(viewport);
 
 			//--Init-depth--
 			var zBufferTextureDescription = new D3D11.Texture2DDescription {
