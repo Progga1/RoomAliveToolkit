@@ -26,12 +26,16 @@ namespace SharpGraphics {
 
 		}
 
+		public void RawEvent(InputEvent ev) {
+
+		}
+
 		public void MouseDown(NormMouseEvent ev) {
-			
+
 		}
 
 		public void MouseMove(NormMouseEvent ev) {
-			
+
 		}
 
 		public void MouseDrag(NormMouseEvent ev) {
@@ -55,17 +59,17 @@ namespace SharpGraphics {
 			
 		}
 
-		public void MouseWheel(int amount,RenderSurface sender) {
-			distance -= amount*distanceFac;
+		public void MouseWheel(MouseWheelEvent ev) {
+			distance -= ev.amount*distanceFac;
 		}
 
-		public void KeyDown(Keys code,RenderSurface sender) {
-			if(code==Keys.ShiftKey)
+		public void KeyDown(KeyEvent ev) {
+			if(ev.code==Keys.ShiftKey)
 				shiftDown = true;
 		}
 
-		public void KeyUp(Keys code,RenderSurface sender) {
-			if(code==Keys.ShiftKey)
+		public void KeyUp(KeyEvent ev) {
+			if(ev.code==Keys.ShiftKey)
 				shiftDown = false;
 		}
 

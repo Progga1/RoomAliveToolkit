@@ -19,6 +19,7 @@ using RoomAliveToolkit;
 using System.Runtime.InteropServices;
 using RoomAliveTestApp.Shaders;
 using System.Threading;
+using RoomAliveTestApp.Scenes;
 
 namespace RoomAliveTestApp {
 
@@ -27,15 +28,14 @@ namespace RoomAliveTestApp {
 		RenderSurface mainSurface;
 		RenderSurface meshSurface;
 
-		private Vector3[] triangleVertices = new Vector3[] { new Vector3(-0.5f,0.5f,0.0f),new Vector3(0.5f,0.5f,0.0f),new Vector3(0.0f,-0.5f,0.0f) };
-		private Vector3[] quadVertices = new Vector3[] { new Vector3(0,1,0.05f),new Vector3(1,1,0.05f),new Vector3(0,0,0.05f),new Vector3(1,0,0.05f) };
-		private D3D11.Buffer triangleVertexBuffer;
+
 		private D3D11.Buffer quadVertexBuffer;
-		private D3D11.VertexBufferBinding triangleBinding;
 		private D3D11.VertexBufferBinding quadBinding;
-		private SingleColorShader singleColorShader;
 		private SingleColorShader singleColorShader2;
 		private CameraControl cameraControl = new CameraControl();
+
+		private Scene triangleScene;
+		private Scene quadScene;
 
 		//RoomAlive objects
 		private ProjectorCameraEnsemble ensemble;
@@ -54,14 +54,15 @@ namespace RoomAliveTestApp {
 
 			ensemble = RoomAliveToolkit.ProjectorCameraEnsemble.FromFile("C:/Users/Progga/Documents/Visual Studio 2015/Projects/RoomAliveToolkit/calibration/single_projector4/calibration4.xml");
 
+			triangleScene = new TriangleScene();
+			quadScene = new QuadScene();
+
 			new Thread(new ThreadStart(() => {
 				mainSurface = new RenderSurface(RenderCallback);
 				mainSurface.setInputCallback(this);
 				mainSurface.initWindowed("Triangle",640,480);
 
-				triangleVertexBuffer = D3D11.Buffer.Create<Vector3>(mainSurface.device,D3D11.BindFlags.VertexBuffer,triangleVertices);
-				triangleBinding = new D3D11.VertexBufferBinding(triangleVertexBuffer,Utilities.SizeOf<Vector3>(),0);
-				singleColorShader = new SingleColorShader(mainSurface.device);
+				triangleScene.Init(mainSurface);
 
 				mainSurface.run();
 			})).Start();
@@ -73,24 +74,19 @@ namespace RoomAliveTestApp {
 				meshSurface.initWindowed("Mesh",640,480);
 				meshSurface.setOrthographicProjection(1,0,10);
 
-				quadVertexBuffer = D3D11.Buffer.Create<Vector3>(meshSurface.device,D3D11.BindFlags.VertexBuffer,quadVertices);
+				quadVertexBuffer = D3D11.Buffer.Create<Vector3>(meshSurface.device,D3D11.BindFlags.VertexBuffer,DefaultMeshes.quadVertices);
 				quadBinding = new D3D11.VertexBufferBinding(quadVertexBuffer,Utilities.SizeOf<Vector3>(),0);
 				singleColorShader2 = new SingleColorShader(meshSurface.device);
 
 				meshSurface.run();
 			})).Start();
+
+
 		}
 
 		private void RenderCallback(D3DDeviceContext context,RenderSurface sender) {
 			if(sender==mainSurface) {
-				singleColorShader.activate();
-				SharpDX.Matrix mvpMat = mainSurface.getProjectionMatrix();
-				float[] mvp = mvpMat.ToArray();
-				singleColorShader.updateVSConstantBuffer(mvp);
-				singleColorShader.passColor(1,0.5f,0,1);
-				context.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
-				context.InputAssembler.SetVertexBuffers(0,triangleBinding);
-				context.Draw(triangleVertices.Count(),0);
+				triangleScene.OnDraw();
 			}
 			if(sender==meshSurface) {
 				SharpDX.Matrix viewMat = cameraControl.getViewMatrix();
@@ -114,8 +110,12 @@ namespace RoomAliveTestApp {
 		public new void Dispose() {
 			mainSurface.Dispose();
 			meshSurface.Dispose();
-			triangleVertexBuffer.Dispose();
-			singleColorShader.Dispose();
+			triangleScene.Dispose();
+			quadScene.Dispose();
+		}
+
+		public void RawEvent(InputEvent ev) {
+
 		}
 
 		public void MouseDown(NormMouseEvent mouseEvent) {
@@ -128,15 +128,7 @@ namespace RoomAliveTestApp {
 
 		public void MouseDrag(NormMouseEvent mouseEvent) {
 			if(mouseEvent.sender==mainSurface) {
-				int id = 0;
-				if(mouseEvent.button==MouseButtons.Right)
-					id = 1;
-				if(mouseEvent.button==MouseButtons.Middle)
-					id = 2;
-				triangleVertices[id].X = mouseEvent.x;
-				triangleVertices[id].Y = mouseEvent.y;
-
-				mainSurface.context.UpdateSubresource(triangleVertices,triangleVertexBuffer);
+				triangleScene.MouseDrag(mouseEvent);
 			}
 			if(mouseEvent.sender==meshSurface) {
 				cameraControl.MouseDrag(mouseEvent);
@@ -144,22 +136,19 @@ namespace RoomAliveTestApp {
 		}
 
 		public void MouseUp(NormMouseEvent mouseEvent) {
-			
+
 		}
 
-		public void MouseWheel(int amount,RenderSurface sender) {
-			if(sender==meshSurface)
-				cameraControl.MouseWheel(amount,sender);
+		public void MouseWheel(MouseWheelEvent ev) {
+
 		}
 
-		public void KeyDown(Keys code,RenderSurface sender) {
-			if(sender==meshSurface)
-				cameraControl.KeyDown(code,sender);
+		public void KeyDown(KeyEvent ev) {
+
 		}
 
-		public void KeyUp(Keys code,RenderSurface sender) {
-			if(sender==meshSurface)
-				cameraControl.KeyUp(code,sender);
+		public void KeyUp(KeyEvent ev) {
+
 		}
 	}
 }

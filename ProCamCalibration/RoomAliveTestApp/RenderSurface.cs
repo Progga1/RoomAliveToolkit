@@ -29,6 +29,8 @@ namespace SharpGraphics {
 		private Action<D3DDeviceContext,RenderSurface> OnDraw;
 		private InputCallbacks inputCallbacks;
 		private NormMouseEvent mouseEvent = new NormMouseEvent();
+		private MouseWheelEvent mouseWheelEvent = new MouseWheelEvent();
+		private KeyEvent keyEvent = new KeyEvent();
 		private MouseButtons mouseDragButton = MouseButtons.None;
 		private float lstX, lstY;
 
@@ -129,7 +131,10 @@ namespace SharpGraphics {
 			return -(float)pixelY/height*2+1;
 		}
 
-		private NormMouseEvent CreateMouseEvent(MouseEventArgs ev) {
+		private NormMouseEvent CreateMouseEvent(int action,MouseEventArgs ev) {
+			mouseEvent.handled = false;
+			mouseEvent.sender = this;
+			mouseEvent.action = action;
 			mouseEvent.x = pixelToNormX(ev.X);
 			mouseEvent.y = pixelToNormY(ev.Y);
 			mouseEvent.dx = mouseEvent.x-lstX;
@@ -137,7 +142,6 @@ namespace SharpGraphics {
 			lstX = mouseEvent.x;
 			lstY = mouseEvent.y;
 			mouseEvent.button = ev.Button;
-			mouseEvent.sender = this;
 			return mouseEvent;
 		}
 
@@ -146,44 +150,55 @@ namespace SharpGraphics {
 			lstY = pixelToNormY(ev.Y);
 			mouseDragButton = ev.Button;
 			if(inputCallbacks!=null) {
-				CreateMouseEvent(ev);
+				CreateMouseEvent(NormMouseEvent.ACTION_MOUSEDOWN,ev);
 			}
 		}
 
 		public void MouseMove(object sender,MouseEventArgs ev) {
 			if(inputCallbacks!=null) {
 				if(mouseDragButton==MouseButtons.None)
-					inputCallbacks.MouseMove(CreateMouseEvent(ev));
+					inputCallbacks.MouseMove(CreateMouseEvent(NormMouseEvent.ACTION_MOUSEMOVE,ev));
 				else {
-					NormMouseEvent nEv = CreateMouseEvent(ev);
+					NormMouseEvent nEv = CreateMouseEvent(NormMouseEvent.ACTION_MOUSEDRAG,ev);
 					nEv.button = mouseDragButton;
 					inputCallbacks.MouseDrag(nEv);
 				}
 			}
 		}
 
-		public void MouseWheel(object sender, MouseEventArgs ev) {
-			if(inputCallbacks!=null) {
-				inputCallbacks.MouseWheel(ev.Delta>0?1:-1,this);
-			}
-		}
-
 		public void MouseUp(object sender,MouseEventArgs ev) {
 			mouseDragButton = MouseButtons.None;
 			if(inputCallbacks!=null) {
-				inputCallbacks.MouseUp(CreateMouseEvent(ev));
+				inputCallbacks.MouseUp(CreateMouseEvent(NormMouseEvent.ACTION_MOUSEUP,ev));
 			}
+		}
+
+		public void MouseWheel(object sender, MouseEventArgs ev) {
+			if(inputCallbacks!=null) {
+				mouseWheelEvent.handled = false;
+				mouseWheelEvent.sender = this;
+				mouseWheelEvent.amount = ev.Delta>0 ? 1 : -1;
+				inputCallbacks.MouseWheel(mouseWheelEvent);
+			}
+		}
+
+		private KeyEvent createKeyEvent(int action,KeyEventArgs ev) {
+			keyEvent.handled = false;
+			keyEvent.sender = this;
+			keyEvent.action = action;
+			keyEvent.code = ev.KeyCode;
+			return keyEvent;
 		}
 
 		public void KeyDown(object sender,KeyEventArgs ev) {
 			if(inputCallbacks!=null) {
-				inputCallbacks.KeyDown(ev.KeyCode,this);
+				inputCallbacks.KeyDown(createKeyEvent(KeyEvent.ACTION_KEYDOWN,ev));
 			}
 		}
 
 		public void KeyUp(object sender,KeyEventArgs ev) {
 			if(inputCallbacks!=null) {
-				inputCallbacks.KeyUp(ev.KeyCode,this);
+				inputCallbacks.KeyUp(createKeyEvent(KeyEvent.ACTION_KEYUP,ev));
 			}
 		}
 

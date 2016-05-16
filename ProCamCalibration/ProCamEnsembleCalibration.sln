@@ -32,6 +32,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectionMappingSample", "
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoomAliveTestApp", "RoomAliveTestApp\RoomAliveTestApp.csproj", "{29DDFF06-FFB3-442C-B135-CDF73B075777}"
+	ProjectSection(ProjectDependencies) = postProject
+		{59A35887-D3F7-4AB8-862F-98F68F9F7B51} = {59A35887-D3F7-4AB8-862F-98F68F9F7B51}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

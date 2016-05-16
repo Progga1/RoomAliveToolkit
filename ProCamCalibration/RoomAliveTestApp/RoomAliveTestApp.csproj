@@ -63,9 +63,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CameraControl.cs" />
+    <Compile Include="DefaultMeshes.cs" />
     <Compile Include="FloatColor.cs" />
     <Compile Include="InputCallbacks.cs" />
     <Compile Include="RenderSurface.cs" />
+    <Compile Include="Scene.cs" />
+    <Compile Include="Scenes\QuadScene.cs" />
+    <Compile Include="Scenes\TriangleScene.cs" />
     <Compile Include="ShaderBase.cs" />
     <Compile Include="Shaders\SingleColorShader.cs" />
     <Compile Include="TestApp.cs" />
@@ -79,6 +83,10 @@
     <ProjectReference Include="..\ProCamEnsembleCalibration\ProCamEnsembleCalibrationLib.csproj">
       <Project>{d8a7fb2f-f8fd-4489-aa7b-82b57b12d6f1}</Project>
       <Name>ProCamEnsembleCalibrationLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ProjectionMappingSample\ProjectionMappingSample.csproj">
+      <Project>{59a35887-d3f7-4ab8-862f-98f68f9f7b51}</Project>
+      <Name>ProjectionMappingSample</Name>
     </ProjectReference>
     <ProjectReference Include="..\Shaders\Shaders.vcxproj">
       <Project>{ee25a666-f343-402a-bce8-756877510f5d}</Project>
