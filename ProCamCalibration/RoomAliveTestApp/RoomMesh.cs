@@ -28,12 +28,20 @@ namespace RoomAliveTestApp {
 			this.context = device.ImmediateContext;
 		}
 
-		public void loadObj(string filename) {
+		public RoomMesh loadObj(string filename) {
 			var mesh = new Mesh();
 			mesh.flipTexY = flipTexY;
 			mesh.LoadFromOBJFile(filename);
 			meshShader = new MeshShader(device);
 			meshDeviceResources = new MeshDeviceResources(device,imagingFactory,mesh);
+			return this;
+		}
+
+		public RoomMesh setMesh(Mesh mesh) {
+			flipTexY = mesh.flipTexY;
+			meshShader = new MeshShader(device);
+			meshDeviceResources = new MeshDeviceResources(device,imagingFactory,mesh);
+			return this;
 		}
 
 	}

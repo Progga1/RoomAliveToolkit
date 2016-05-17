@@ -16,6 +16,7 @@ namespace ProjectionMappingApp {
 
 	class OutsideViewScene : Scene {
 
+		RoomAliveScene roomScene;
 		ProjectorCameraEnsemble ensemble;
 
 		private SingleColorShader singleColorShader;
@@ -29,26 +30,20 @@ namespace ProjectionMappingApp {
 		private Vector3[] points = new Vector3[8];
 		private float[] mvp;
 
-		public OutsideViewScene(ProjectorCameraEnsemble ensemble) {
-			this.ensemble = ensemble;
+		public OutsideViewScene(RoomAliveScene roomScene) {
+			this.roomScene = roomScene;
+			this.ensemble = roomScene.ensemble;
 		}
 
 		protected override void PostInit() {
 			singleColorShader = new SingleColorShader(device);
-			rMesh = loadObj("Assets/calibration/desktop_room4.obj",true);
+			rMesh = new RoomMesh(device).setMesh(roomScene.roomMesh);
 			cameraControl.distance = 5;
 		}
 
-		private void drawViewFrustum(RoomMatrix pose,RoomMatrix intrinsics,FloatColor color,int imgWidth,int imgHeight,float near,float far) {
-			SharpMatrix extrinsics = MatrixOps.getSharpMatrix(pose);
-			float fx = (float)intrinsics[0,0];
-			float fy = (float)intrinsics[1,1];
-			float cx = (float)intrinsics[0,2];
-			float cy = (float)intrinsics[1,2];
-			//				float fovX = (float)Math.Atan((512f/2)/fx)*2;
-			projection = GraphicsTransforms.ProjectionMatrixFromCameraMatrix(fx,fy,cx,cy,imgWidth,imgHeight,near,far);
-			extrinsics.Invert();
-			worldToNorm = projection*extrinsics;
+		private void drawViewFrustum(SharpMatrix worldTransform,SharpMatrix projection,FloatColor color) {
+			
+			worldToNorm = projection* worldTransform;
 			normToWorld = worldToNorm;
 			normToWorld.Invert();
 
@@ -70,6 +65,18 @@ namespace ProjectionMappingApp {
 			singleColorShader.updateVSConstantBuffer(mvp);
 			context.InputAssembler.PrimitiveTopology = PrimitiveTopology.LineList;
 			graphics.flush();
+		}
+
+		private void drawViewFrustum(RoomMatrix pose,RoomMatrix intrinsics,FloatColor color,int imgWidth,int imgHeight,float near,float far) {
+			SharpMatrix extrinsics = MatrixOps.getSharpMatrix(pose);
+			extrinsics.Invert();
+			float fx = (float)intrinsics[0,0];
+			float fy = (float)intrinsics[1,1];
+			float cx = (float)intrinsics[0,2];
+			float cy = (float)intrinsics[1,2];
+			projection = GraphicsTransforms.ProjectionMatrixFromCameraMatrix(fx,fy,cx,cy,imgWidth,imgHeight,near,far);
+
+			drawViewFrustum(extrinsics,projection,color);
 		}
 
 		public override void OnDraw() {
@@ -96,6 +103,9 @@ namespace ProjectionMappingApp {
 			foreach(var camera in ensemble.cameras) {
 				drawViewFrustum(camera.pose,camera.calibration.depthCameraMatrix,new FloatColor(0.2f,0.2f,0.6f),512,424,0.5f,4.5f);
 			}
+
+			drawViewFrustum(roomScene.headPose,roomScene.headProjection,new FloatColor(0.7f,0.1f,0.05f));
+
 			if(false) {
 				singleColorShader.activate();
 				singleColorShader.updateVSConstantBuffer(mvp);

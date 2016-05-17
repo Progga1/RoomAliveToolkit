@@ -14,7 +14,7 @@ namespace ProjectionMappingApp {
 	class ProjectionMappingApp : ApplicationContext,IDisposable {
 
 		//RoomAlive objects
-		private ProjectorCameraEnsemble ensemble;
+		private RoomAliveScene roomScene;
 
 		private RenderSurface outsideSurface;
 		private OutsideViewScene outsideViewScene;
@@ -29,10 +29,10 @@ namespace ProjectionMappingApp {
 		}
 
 		ProjectionMappingApp() {
-			ensemble = RoomAliveToolkit.ProjectorCameraEnsemble.FromFile("Assets/calibration/calibration4.xml");
+			roomScene = new RoomAliveScene("Assets/calibration/calibration4.xml","Assets/calibration/desktop_room4.obj");
 
 			new Thread(new ThreadStart(() => {
-				outsideViewScene = new OutsideViewScene(ensemble);
+				outsideViewScene = new OutsideViewScene(roomScene);
 				outsideSurface = new RenderSurface(outsideViewScene.RenderCallback);
 				outsideSurface.initWindowed("Outside view",800,600);
 				outsideSurface.setInputCallback(outsideViewScene);

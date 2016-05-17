@@ -73,6 +73,7 @@
     <Compile Include="OutsideViewScene.cs" />
     <Compile Include="ProjectionMappingApp.cs" />
     <Compile Include="RenderSurface.cs" />
+    <Compile Include="RoomAliveScene.cs" />
     <Compile Include="RoomMesh.cs" />
     <Compile Include="Scene.cs" />
     <Compile Include="Scenes\MeshScene.cs" />
