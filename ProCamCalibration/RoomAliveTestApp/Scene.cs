@@ -22,6 +22,9 @@ namespace SharpGraphics {
 		protected D3DDeviceContext context;
 		protected PointLight pointLight = new PointLight();
 
+		protected SharpDX.Matrix mvp;
+		protected SharpDX.Matrix mvpTransp;
+
 		protected abstract void PostInit();
 
 		public void Init(RenderSurface surface) {
@@ -43,6 +46,12 @@ namespace SharpGraphics {
 
 		public RoomMesh loadObj(string filename) {
 			return loadObj(filename,false);
+		}
+
+		protected void setMVP(SharpDX.Matrix mvp) {
+			this.mvp = mvp;
+			this.mvpTransp = mvp;
+			this.mvpTransp.Transpose();
 		}
 
 		public virtual void OnDraw() {

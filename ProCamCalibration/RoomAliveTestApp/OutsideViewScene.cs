@@ -28,7 +28,6 @@ namespace ProjectionMappingApp {
 		private SharpMatrix normToWorld = new SharpMatrix();
 		private SharpMatrix projection = new SharpMatrix();
 		private Vector3[] points = new Vector3[8];
-		private float[] mvp;
 
 		public OutsideViewScene(RoomAliveScene roomScene) {
 			this.roomScene = roomScene;
@@ -62,7 +61,7 @@ namespace ProjectionMappingApp {
 
 			singleColorShader.activate();
 			singleColorShader.passColor(color);
-			singleColorShader.updateVSConstantBuffer(mvp);
+			singleColorShader.updateVSConstantBuffer(mvpTransp);
 			context.InputAssembler.PrimitiveTopology = PrimitiveTopology.LineList;
 			graphics.flush();
 		}
@@ -86,16 +85,13 @@ namespace ProjectionMappingApp {
 
 			SharpMatrix projMat = surface.getProjectionMatrix();
 			SharpMatrix viewMat = cameraControl.getViewMatrix();
-			rMesh.meshShader.SetVertexShaderConstants(context,SharpMatrix.Identity,viewMat*projMat,pointLight.position);
+			setMVP(viewMat*projMat);
+
+			rMesh.meshShader.SetVertexShaderConstants(context,SharpMatrix.Identity,mvp,pointLight.position);
 			rMesh.meshShader.Render(context,rMesh.meshDeviceResources,pointLight,null,null,surface.viewport);
 
 			viewMat = cameraControl.getViewMatrix();
-			viewMat.Transpose();
 			projMat = surface.getProjectionMatrix();
-			projMat.Transpose();
-			SharpMatrix mvpMat = SharpMatrix.Multiply(projMat,viewMat);
-			mvp = mvpMat.ToArray();
-
 			foreach(var projector in ensemble.projectors) {
 				drawViewFrustum(projector.pose,projector.cameraMatrix,new FloatColor(0.5f,0.4f,0.05f),projector.width,projector.height,0.1f,3.0f);
 			}
@@ -108,7 +104,7 @@ namespace ProjectionMappingApp {
 
 			if(false) {
 				singleColorShader.activate();
-				singleColorShader.updateVSConstantBuffer(mvp);
+				singleColorShader.updateVSConstantBuffer(mvpTransp);
 				singleColorShader.passColor(0,1,0,1);
 				graphics.putPos(1,1,1);
 				graphics.putPos(-1,0.5f,1);

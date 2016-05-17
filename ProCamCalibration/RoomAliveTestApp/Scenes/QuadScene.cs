@@ -33,7 +33,6 @@ namespace RoomAliveTestApp.Scenes {
 			cubeBinding = new D3D11.VertexBufferBinding(cubeVertexBuffer,Utilities.SizeOf<Vector3>(),0);
 			cubeIndexBuffer = D3D11.Buffer.Create<int>(device,D3D11.BindFlags.IndexBuffer,DefaultMeshes.cubeIndices);
 
-			cameraControl.transposed = true;
 			singleColorShader = new SingleColorShader(device);
 		}
 
@@ -44,11 +43,10 @@ namespace RoomAliveTestApp.Scenes {
 			surface.setPerspectiveProjection(1.4f,0.01f,10);
 
 			SharpDX.Matrix projMat = surface.getProjectionMatrix();
-			projMat.Transpose();
-			SharpDX.Matrix mvpMat = SharpDX.Matrix.Multiply(projMat,viewMat);
-			float[] mvp = mvpMat.ToArray();
+			SharpDX.Matrix mvpMat = viewMat * projMat;
+			mvpMat.Transpose();
 			singleColorShader.activate();
-			singleColorShader.updateVSConstantBuffer(mvp);
+			singleColorShader.updateVSConstantBuffer(mvpMat);
 
 			singleColorShader.passColor(1,0,0,1);
 			context.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleStrip;
@@ -60,7 +58,7 @@ namespace RoomAliveTestApp.Scenes {
 			context.InputAssembler.SetVertexBuffers(0,cubeBinding);
 			context.InputAssembler.SetIndexBuffer(cubeIndexBuffer,SharpDX.DXGI.Format.R32_UInt,0);
 			context.DrawIndexed(DefaultMeshes.cubeIndices.Length,0,0);
-
+if(false) { 
 			singleColorShader.passColor(0,1,0,1);
 			graphics.putPos(1,1,1);
 			graphics.putPos(-1,0.5f,1);
@@ -68,6 +66,7 @@ namespace RoomAliveTestApp.Scenes {
 			graphics.putIndex(1);
 			context.InputAssembler.PrimitiveTopology = PrimitiveTopology.LineList;
 			graphics.flush();
+			}
 		}
 
 		public override void RawEvent(InputEvent ev) {
