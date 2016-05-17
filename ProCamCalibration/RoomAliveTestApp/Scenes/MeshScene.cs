@@ -18,7 +18,7 @@ namespace RoomAliveTestApp.Scenes {
 		protected override void PostInit() {
 			rMesh = loadObj("Assets/FloorPlan.obj");
 
-			surface.setDepthEnabled(true);
+			graphics.setDepthEnabled(true);
 		}
 
 		public override void OnDraw() {

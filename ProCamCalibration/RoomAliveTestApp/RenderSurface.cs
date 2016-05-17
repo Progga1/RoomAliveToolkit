@@ -25,6 +25,8 @@ namespace SharpGraphics {
 		public float ratioX { get; private set; }
 		public SharpDX.Color clearColor = new SharpDX.Color(5,5,60);
 
+		public SharpGraphics graphics;
+
 		//Callbacks
 		private Action<D3DDeviceContext,RenderSurface> OnDraw;
 		private InputCallbacks inputCallbacks;
@@ -39,8 +41,6 @@ namespace SharpGraphics {
 		public D3DDeviceContext context;
 		public DepthStencilView depthStencilView;
 		public SwapChain swapChain;
-		public DepthStencilState depthEnabledState;
-		public DepthStencilState depthDisabledState;
 		public Viewport viewport { get; private set; }
 		public RenderForm renderForm { get; private set; }
 		public D3D11.RenderTargetView renderTargetView { get; private set; }
@@ -104,15 +104,9 @@ namespace SharpGraphics {
 			};
 			using(var zBufferTexture = new Texture2D(device,zBufferTextureDescription))
 				depthStencilView = new DepthStencilView(device,zBufferTexture);
-			var depthStencilDesc = new D3D11.DepthStencilStateDescription {
-				DepthWriteMask = DepthWriteMask.All,
-				DepthComparison = Comparison.Less,
-				IsDepthEnabled = true
-			};
-			depthEnabledState = new DepthStencilState(device,depthStencilDesc);
-			depthDisabledState = new DepthStencilState(device,new D3D11.DepthStencilStateDescription { });
-			setDepthEnabled(true);
 			context.OutputMerger.SetTargets(depthStencilView,renderTargetView);
+
+			graphics = new SharpGraphics(device);
 		}
 
 		public void setOrthographicProjection(float zoom,float near,float far) {
@@ -129,10 +123,6 @@ namespace SharpGraphics {
 
 		public Matrix getProjectionMatrix() {
 			return projMat;
-		}
-
-		public void setDepthEnabled(bool enabled) {
-			context.OutputMerger.SetDepthStencilState(enabled?depthEnabledState:depthDisabledState);
 		}
 
 		public void setInputCallback(InputCallbacks callbacks) {

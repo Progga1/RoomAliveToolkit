@@ -17,6 +17,7 @@ namespace SharpGraphics {
 	abstract class Scene : InputCallbacks,IDisposable {
 
 		protected RenderSurface surface;
+		protected SharpGraphics graphics;
 		protected D3DDevice device;
 		protected D3DDeviceContext context;
 		protected PointLight pointLight = new PointLight();
@@ -27,6 +28,7 @@ namespace SharpGraphics {
 			this.surface = surface;
 			this.device = surface.device;
 			this.context = surface.context;
+			this.graphics = surface.graphics;
 			pointLight.position = new Vector3(0,2,0);
 			pointLight.Ia = new Vector3(0.1f,0.1f,0.1f);
 			PostInit();

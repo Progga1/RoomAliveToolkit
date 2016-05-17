@@ -79,6 +79,7 @@
     <Compile Include="Scenes\TriangleScene.cs" />
     <Compile Include="ShaderBase.cs" />
     <Compile Include="Shaders\SingleColorShader.cs" />
+    <Compile Include="SharpGraphics.cs" />
     <Compile Include="TestApp.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

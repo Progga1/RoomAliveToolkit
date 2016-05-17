@@ -57,21 +57,23 @@ namespace SharpGraphics {
 		}
 
 		public void MouseDrag(NormMouseEvent ev) {
-			if(!shiftDown) {
+			getViewMatrix();
+			Vector4 right = viewTransf.Column1;
+			Vector4 up = viewTransf.Column2;
+			Vector4 forward = viewTransf.Column3;
+			if(!shiftDown && ev.isLeft()) {
 				alpha -= ev.dx;
 				beta -= ev.dy;
 				applyConstraints();
-			} else {
-				getViewMatrix();
-				Vector4 right = viewTransf.Column1;
-				Vector4 up = viewTransf.Column2;
+			}
+			if(shiftDown || ev.isMiddle()) { 
 				position -= new Vector3(right.X,right.Y,right.Z)*ev.dx;
 				position -= new Vector3(up.X,up.Y,up.Z)*ev.dy;
-
-//				Console.WriteLine("Right: "+right);
-//				Console.WriteLine("POS: "+position);
 			}
-			
+			if(ev.isRight()) {
+				position -= new Vector3(right.X,right.Y,right.Z)*ev.dx;
+				position -= new Vector3(forward.X,forward.Y,forward.Z)*ev.dy;
+			}
 		}
 
 		public void MouseUp(NormMouseEvent ev) {

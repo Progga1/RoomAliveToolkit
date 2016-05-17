@@ -51,6 +51,18 @@ namespace SharpGraphics {
 			return false;
 		}
 
+		public bool isLeft() {
+			return button==MouseButtons.Left;
+		}
+
+		public bool isMiddle() {
+			return button==MouseButtons.Middle;
+		}
+
+		public bool isRight() {
+			return button==MouseButtons.Right;
+		}
+
 	}
 
 	public class KeyEvent : InputEvent {
