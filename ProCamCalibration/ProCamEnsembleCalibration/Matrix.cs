@@ -3,6 +3,7 @@ using System.Xml.Serialization;
 using System.IO;
 using MathNet.Numerics.LinearAlgebra;
 using System.Threading.Tasks;
+using SharpDX;
 
 namespace RoomAliveToolkit
 {

@@ -8,6 +8,19 @@ namespace RoomAliveTestApp {
 
 	struct FloatColor {
 		public float r,g,b,a;
+
+		public FloatColor(float r,float g,float b) : this() {
+			this.r = r;
+			this.g = g;
+			this.b = b;
+		}
+
+		public FloatColor(float r,float g,float b,float a) : this() {
+			this.r = r;
+			this.g = g;
+			this.b = b;
+			this.a = a;
+		}
 	}
 
 }

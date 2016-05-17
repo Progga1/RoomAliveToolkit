@@ -82,6 +82,41 @@ namespace SharpGraphics {
 			positions[vertexPos++] = pos;
 		}
 
+		public void putPos(Vector3[] pos) {
+			foreach(Vector3 p in pos)
+				positions[vertexPos++] = p;
+		}
+
+		public void putCubeLineIndices() {
+			int baseIndex = indexPos;
+			indices[indexPos++] = baseIndex;
+			indices[indexPos++] = baseIndex+1;
+			indices[indexPos++] = baseIndex+1;
+			indices[indexPos++] = baseIndex+3;
+			indices[indexPos++] = baseIndex+3;
+			indices[indexPos++] = baseIndex+2;
+			indices[indexPos++] = baseIndex+2;
+			indices[indexPos++] = baseIndex;
+
+			indices[indexPos++] = baseIndex+4;
+			indices[indexPos++] = baseIndex+5;
+			indices[indexPos++] = baseIndex+5;
+			indices[indexPos++] = baseIndex+7;
+			indices[indexPos++] = baseIndex+7;
+			indices[indexPos++] = baseIndex+6;
+			indices[indexPos++] = baseIndex+6;
+			indices[indexPos++] = baseIndex+4;
+
+			indices[indexPos++] = baseIndex;
+			indices[indexPos++] = baseIndex+4;
+			indices[indexPos++] = baseIndex+1;
+			indices[indexPos++] = baseIndex+5;
+			indices[indexPos++] = baseIndex+2;
+			indices[indexPos++] = baseIndex+6;
+			indices[indexPos++] = baseIndex+3;
+			indices[indexPos++] = baseIndex+7;
+		}
+
 		public void putIndex(int index) {
 			indices[indexPos++] = index;
 		}
@@ -93,6 +128,8 @@ namespace SharpGraphics {
 		}
 
 		public void flush() {
+			if(indexPos==0)
+				return;
 			SharpDX.DataStream dataStream;
 //			context.MapSubresource(psConstantBuffer,MapMode.WriteDiscard,MapFlags.None,out dataStream);
 //			dataStream.Write<T>(values);
@@ -112,6 +149,9 @@ namespace SharpGraphics {
 			context.InputAssembler.SetIndexBuffer(indexBuffer,SharpDX.DXGI.Format.R32_UInt,0);
 
 			context.DrawIndexed(indexPos,0,0);
+
+			indexPos = 0;
+			vertexPos = 0;
 		}
 
 	}
