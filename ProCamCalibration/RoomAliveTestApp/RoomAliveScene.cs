@@ -12,10 +12,48 @@ namespace RoomAliveTestApp {
 
 	class RoomAliveScene {
 
+		public class Head {
+			public SharpMatrix projection;
+			public Vector3 position;
+
+			public Head() {
+				position = new Vector3(-1,-0.5f,-0.2f);
+
+				projection = SharpMatrix.PerspectiveFovLH(1.2f,1.2f,0.05f,10);
+			}
+
+			public SharpMatrix getView() {
+				SharpMatrix result = getWorldTransform();
+				result.Invert();
+				return result;
+			}
+
+			public SharpMatrix getProjection() {
+				return projection;
+			}
+
+			public SharpMatrix getProjectionTransp() {
+				SharpMatrix result = projection;
+				result.Transpose();
+				return result;
+			}
+
+			public SharpMatrix getWorldTransform() {
+				SharpMatrix worldTransform = SharpMatrix.Translation(position);
+				return worldTransform;
+			}
+
+			public SharpMatrix getWorldTransformTransp() {
+				SharpMatrix result = getWorldTransform();
+				result.Transpose();
+				return result;
+			}
+
+		}
+
 		public ProjectorCameraEnsemble ensemble;
 		public Mesh roomMesh;
-		public SharpMatrix headProjection;
-		public SharpMatrix headPose;
+		public Head head;
 
 		public RoomAliveScene(string calibrationFile,string meshFile) {
 			ensemble = RoomAliveToolkit.ProjectorCameraEnsemble.FromFile(calibrationFile);
@@ -23,11 +61,7 @@ namespace RoomAliveTestApp {
 			roomMesh.flipTexY = true;
 			roomMesh.LoadFromOBJFile(meshFile);
 
-			headProjection = SharpMatrix.PerspectiveFovRH(1.5f,1.2f,0.01f,10);
-			headPose = SharpMatrix.Translation(-1,-0.5f,-0.2f);
-			headPose.Transpose();
-			headProjection.Transpose();
-			Console.WriteLine(SharpMatrix.Translation(-1,-0.5f,-0.2f));
+			head = new Head();
 		}
 
 	}

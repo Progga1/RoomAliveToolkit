@@ -70,13 +70,13 @@ namespace RoomAliveTestApp {
 
 			new Thread(new ThreadStart(() => {
 				meshSurface = new RenderSurface(RenderCallback);
-				meshSurface.setInputCallback(this);
 				meshSurface.clearColor = new Color(45,45,45);
 				meshSurface.initWindowed("Mesh",800,600);
 
 				meshScene = new MeshScene();
 				meshScene.Init(meshSurface);
 
+				meshSurface.setInputCallback(this);
 				meshSurface.run();
 			})).Start();
 

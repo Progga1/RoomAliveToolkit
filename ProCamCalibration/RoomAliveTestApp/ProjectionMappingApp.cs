@@ -35,9 +35,9 @@ namespace ProjectionMappingApp {
 				outsideViewScene = new OutsideViewScene(roomScene);
 				outsideSurface = new RenderSurface(outsideViewScene.RenderCallback);
 				outsideSurface.initWindowed("Outside view",800,600);
-				outsideSurface.setInputCallback(outsideViewScene);
 				outsideViewScene.Init(outsideSurface);
 
+				outsideSurface.setInputCallback(outsideViewScene);
 				outsideSurface.run();
 			})).Start();
 

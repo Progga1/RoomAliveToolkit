@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using RoomMatrix = RoomAliveToolkit.Matrix;
 using SharpMatrix = SharpDX.Matrix;
 
@@ -17,6 +18,7 @@ namespace ProjectionMappingApp {
 	class OutsideViewScene : Scene {
 
 		RoomAliveScene roomScene;
+		RoomAliveScene.Head head;
 		ProjectorCameraEnsemble ensemble;
 
 		private SingleColorShader singleColorShader;
@@ -31,6 +33,7 @@ namespace ProjectionMappingApp {
 
 		public OutsideViewScene(RoomAliveScene roomScene) {
 			this.roomScene = roomScene;
+			this.head = roomScene.head;
 			this.ensemble = roomScene.ensemble;
 		}
 
@@ -100,7 +103,7 @@ namespace ProjectionMappingApp {
 				drawViewFrustum(camera.pose,camera.calibration.depthCameraMatrix,new FloatColor(0.2f,0.2f,0.6f),512,424,0.5f,4.5f);
 			}
 
-			drawViewFrustum(roomScene.headPose,roomScene.headProjection,new FloatColor(0.7f,0.1f,0.05f));
+			drawViewFrustum(head.getWorldTransformTransp(),head.getProjectionTransp(),new FloatColor(0.7f,0.1f,0.05f));
 
 			if(false) {
 				singleColorShader.activate();
@@ -122,6 +125,19 @@ namespace ProjectionMappingApp {
 
 		public override void Dispose() {
 			singleColorShader.Dispose();
+		}
+
+		public override void KeyDown(KeyEvent ev) {
+			base.KeyDown(ev);
+			const float HEAD_STEP = 0.1f;
+			if(ev.code==Keys.D)
+				head.position.X += HEAD_STEP;
+			if(ev.code==Keys.A)
+				head.position.X -= HEAD_STEP;
+			if(ev.code==Keys.W)
+				head.position.Y -= HEAD_STEP;
+			if(ev.code==Keys.S)
+				head.position.Y += HEAD_STEP;
 		}
 
 	}

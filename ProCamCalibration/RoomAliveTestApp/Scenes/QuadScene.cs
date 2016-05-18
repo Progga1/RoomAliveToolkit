@@ -58,7 +58,7 @@ namespace RoomAliveTestApp.Scenes {
 			context.InputAssembler.SetVertexBuffers(0,cubeBinding);
 			context.InputAssembler.SetIndexBuffer(cubeIndexBuffer,SharpDX.DXGI.Format.R32_UInt,0);
 			context.DrawIndexed(DefaultMeshes.cubeIndices.Length,0,0);
-if(false) { 
+
 			singleColorShader.passColor(0,1,0,1);
 			graphics.putPos(1,1,1);
 			graphics.putPos(-1,0.5f,1);
@@ -66,7 +66,7 @@ if(false) {
 			graphics.putIndex(1);
 			context.InputAssembler.PrimitiveTopology = PrimitiveTopology.LineList;
 			graphics.flush();
-			}
+
 		}
 
 		public override void RawEvent(InputEvent ev) {
