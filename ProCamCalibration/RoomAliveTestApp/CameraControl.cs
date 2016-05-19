@@ -68,8 +68,8 @@ namespace SharpGraphics {
 				position -= new Vector3(right.X,right.Y,right.Z)*ev.dx;
 				position -= new Vector3(up.X,up.Y,up.Z)*ev.dy;
 			}
-			if(ev.isRight()) {
-				position -= new Vector3(right.X,right.Y,right.Z)*ev.dx;
+			if(!shiftDown && ev.isRight()) {
+				position += new Vector3(right.X,right.Y,right.Z)*ev.dx;
 				position -= new Vector3(forward.X,forward.Y,forward.Z)*ev.dy;
 			}
 		}

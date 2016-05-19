@@ -29,7 +29,7 @@ namespace ProjectionMappingApp {
 		}
 
 		ProjectionMappingApp() {
-			roomScene = new RoomAliveScene("Assets/calibration/calibration4.xml","Assets/calibration/desktop_room4.obj");
+			roomScene = new RoomAliveScene("Assets/calibration/calibration4.xml","Assets/calibration/desktop_scene4_verylow.obj");
 
 			new Thread(new ThreadStart(() => {
 				outsideViewScene = new OutsideViewScene(roomScene);

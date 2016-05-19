@@ -27,10 +27,10 @@ namespace RoomAliveToolkit
 
         public class Material
         {
-            public Vector3 ambientColor;
-            public Vector3 diffuseColor;
-            public Vector3 specularColor;
-            public float shininess;
+            public Vector3 ambientColor = new Vector3(0.3f,0.3f,0.3f);
+            public Vector3 diffuseColor = new Vector3(1,1,1);
+			public Vector3 specularColor = new Vector3(0.2f,0.2f,0.2f);
+            public float shininess = 0.1f;
             public string textureFilename;
         }
 
