@@ -5,14 +5,14 @@ cbuffer constants : register(b0) {
 struct vertex_in
 {
 	float4 pos : POSITION;
-	float2 uv : TEXCOORD0;
+	float2 uv : TEXCOORD;
 	float4 color : COLOR;
 };
 
 struct vertex_out
 {
 	float4 pos : SV_POSITION;
-	float2 uv : TEXCOORD0;
+	float2 uv : TEXCOORD;
 	float4 color: COLOR;
 };
 

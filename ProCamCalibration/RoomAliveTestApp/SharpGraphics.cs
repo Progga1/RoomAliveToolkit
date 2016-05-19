@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using SharpDX.Direct3D11;
 using D3D11 = SharpDX.Direct3D11;
 using D3DDevice = SharpDX.Direct3D11.Device;
 using D3DDeviceContext = SharpDX.Direct3D11.DeviceContext;
@@ -19,12 +20,12 @@ namespace SharpGraphics {
 
 		public struct PosUVColor {
 			public Vector3 position;
-			public Vector2 UV;
+			public Vector2 uv;
 			public Vector4 color;
 
 			public PosUVColor(Vector3 position,Vector2 uv,Vector4 color) {
 				this.position=position;
-				this.UV=uv;
+				this.uv=uv;
 				this.color=color;
 			}
 		}
@@ -35,8 +36,8 @@ namespace SharpGraphics {
 
 		public static D3D11.InputElement[] posUVColorElements = new[] {
 			new D3D11.InputElement("POSITION",0,Format.R32G32B32_Float,0,0),
-			new D3D11.InputElement("TEXCOORD",0,Format.R32G32_Float,16,0),
-			new D3D11.InputElement("COLOR",0,Format.R32G32B32A32_Float,24,0)
+			new D3D11.InputElement("TEXCOORD",0,Format.R32G32_Float,12,0),
+			new D3D11.InputElement("COLOR",0,Format.R32G32B32A32_Float,20,0)
 		};
 
 		public static ImagingFactory2 imagingFactory = new ImagingFactory2();
@@ -58,8 +59,11 @@ namespace SharpGraphics {
 		private int indexPos = 0;
 		private int posUVColorPos = 0;
 
+		//Default states
+		public RasterizerState defaultRasterizerState;
 		private D3D11.DepthStencilState depthEnabledState;
 		private D3D11.DepthStencilState depthDisabledState;
+		public BlendState defaultBlendState;
 
 		public static D3D11.DepthStencilView createZBuffer(D3DDevice device,int width,int height) {
 			var zBufferTextureDescription = new D3D11.Texture2DDescription {
@@ -82,48 +86,74 @@ namespace SharpGraphics {
 			this.device = device;
 			this.context = device.ImmediateContext;
 
+			//--Init-rasterizer-state--
+			var rasterizerStateDesc = new RasterizerStateDescription() {
+				CullMode = CullMode.None,
+				FillMode = FillMode.Solid,
+				IsDepthClipEnabled = true,
+//				IsFrontCounterClockwise = true,
+//				IsMultisampleEnabled = true,
+			};
+			defaultRasterizerState = new RasterizerState(device,rasterizerStateDesc);
+
 			//--Init-buffers--
-			var indexBufferDesc = new D3D11.BufferDescription() {
-				Usage = D3D11.ResourceUsage.Dynamic,
-				BindFlags = D3D11.BindFlags.IndexBuffer,
+			var indexBufferDesc = new BufferDescription() {
+				Usage = ResourceUsage.Dynamic,
+				BindFlags = BindFlags.IndexBuffer,
 				SizeInBytes = indices.Length,
-				CpuAccessFlags = D3D11.CpuAccessFlags.Write,
+				CpuAccessFlags = CpuAccessFlags.Write,
 				StructureByteStride = 0,
 				OptionFlags = 0,
 			};
 			indexBuffer = new D3D11.Buffer(device,indexBufferDesc);
 
-			var positionBufferDesc = new D3D11.BufferDescription() {
-				Usage = D3D11.ResourceUsage.Dynamic,
-				BindFlags = D3D11.BindFlags.VertexBuffer,
+			var positionBufferDesc = new BufferDescription() {
+				Usage = ResourceUsage.Dynamic,
+				BindFlags = BindFlags.VertexBuffer,
 				SizeInBytes = positions.Length,
-				CpuAccessFlags = D3D11.CpuAccessFlags.Write,
+				CpuAccessFlags = CpuAccessFlags.Write,
 				StructureByteStride = 0,
 				OptionFlags = 0,
 			};
 			positionBuffer = new D3D11.Buffer(device,positionBufferDesc);
-			positionBinding = new D3D11.VertexBufferBinding(positionBuffer,Utilities.SizeOf<Vector3>(),0);
+			positionBinding = new VertexBufferBinding(positionBuffer,Utilities.SizeOf<Vector3>(),0);
 
-			var vertexBufferDesc = new D3D11.BufferDescription() {
-				Usage = D3D11.ResourceUsage.Dynamic,
-				BindFlags = D3D11.BindFlags.VertexBuffer,
+			var vertexBufferDesc = new BufferDescription() {
+				Usage = ResourceUsage.Dynamic,
+				BindFlags = BindFlags.VertexBuffer,
 				SizeInBytes = posUVColorVals.Length,
-				CpuAccessFlags = D3D11.CpuAccessFlags.Write,
+				CpuAccessFlags = CpuAccessFlags.Write,
 				StructureByteStride = 0,
 				OptionFlags = 0,
 			};
 			posUVColorBuffer = new D3D11.Buffer(device,vertexBufferDesc);
-			posUVColorBinding = new D3D11.VertexBufferBinding(posUVColorBuffer,Utilities.SizeOf<PosUVColor>(),0);
+			posUVColorBinding = new VertexBufferBinding(posUVColorBuffer,Utilities.SizeOf<PosUVColor>(),0);
 
 			//--Init-depth--
-			var depthStencilDesc = new D3D11.DepthStencilStateDescription {
-				DepthWriteMask = D3D11.DepthWriteMask.All,
-				DepthComparison = D3D11.Comparison.LessEqual,
+			var depthStencilDesc = new DepthStencilStateDescription {
+				DepthWriteMask = DepthWriteMask.All,
+				DepthComparison = Comparison.LessEqual,
 				IsDepthEnabled = true
 			};
-			depthEnabledState = new D3D11.DepthStencilState(device,depthStencilDesc);
-			depthDisabledState = new D3D11.DepthStencilState(device,new D3D11.DepthStencilStateDescription { });
+			depthEnabledState = new DepthStencilState(device,depthStencilDesc);
+			depthDisabledState = new DepthStencilState(device,new DepthStencilStateDescription { });
 			setDepthEnabled(true);
+
+
+			//--Init-blending
+			var blendDesc = new RenderTargetBlendDescription(
+					true,
+					BlendOption.SourceAlpha,
+					BlendOption.InverseSourceAlpha,
+					BlendOperation.Add,
+					BlendOption.One,
+					BlendOption.Zero,
+					BlendOperation.Add,
+					ColorWriteMaskFlags.All);
+			var blendDescription = new BlendStateDescription();
+			blendDescription.RenderTarget[0] = blendDesc;
+
+			defaultBlendState = new BlendState(device,blendDescription);
 		}
 
 		public void setDepthEnabled(bool enabled) {
@@ -195,6 +225,10 @@ namespace SharpGraphics {
 
 		public void putPosUVColor(Vector3 position,Vector2 uv,Vector4 color) {
 			posUVColorVals[posUVColorPos++] = new PosUVColor(position,uv,color);
+		}
+
+		public void bindTexture(SamplerState texture) {
+			context.PixelShader.SetSampler(0,texture);
 		}
 
 		public void flush() {
