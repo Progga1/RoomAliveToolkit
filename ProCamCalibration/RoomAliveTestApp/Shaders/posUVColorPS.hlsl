@@ -3,9 +3,11 @@ cbuffer constants : register(b0) {
 }
 
 struct pixel_in {
-	float4 position : SV_POSITION;
+	float4 pos : SV_POSITION;
+	float2 uv : TEXCOORD0;
+	float4 color : COLOR;
 };
 
 float4 main(pixel_in i) : SV_TARGET{
-	return color;
+	return color*i.color;
 }

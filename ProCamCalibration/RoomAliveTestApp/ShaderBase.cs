@@ -17,6 +17,7 @@ namespace RoomAliveTestApp {
 		private D3D11.DeviceContext context;
 		private D3D11.VertexShader vertexShader;
 		private D3D11.PixelShader pixelShader;
+		private ShaderBytecode vertexShaderByteCode;
 		private ShaderSignature inputSignature;
 		private D3D11.InputLayout inputLayout;
 		private D3D11.Buffer vsConstantBuffer;
@@ -25,31 +26,36 @@ namespace RoomAliveTestApp {
 		public ShaderBase(D3D11.Device device,int vsConstantBufferBytes,int psConstantBufferBytes) {
 			this.device = device;
 			this.context = device.ImmediateContext;
-			var vsConstantBufferDesc = new BufferDescription() {
-				Usage = ResourceUsage.Dynamic,
-				BindFlags = BindFlags.ConstantBuffer,
-				SizeInBytes = vsConstantBufferBytes,
-				CpuAccessFlags = CpuAccessFlags.Write,
-				StructureByteStride = 0,
-				OptionFlags = 0,
-			};
-			vsConstantBuffer = new D3D11.Buffer(device,vsConstantBufferDesc);
-			var psConstantBufferDesc = new BufferDescription() {
-				Usage = ResourceUsage.Dynamic,
-				BindFlags = BindFlags.ConstantBuffer,
-				SizeInBytes = psConstantBufferBytes,
-				CpuAccessFlags = CpuAccessFlags.Write,
-				StructureByteStride = 0,
-				OptionFlags = 0,
-			};
-			psConstantBuffer = new D3D11.Buffer(device,psConstantBufferDesc);
+			if(vsConstantBufferBytes>0) {
+				var vsConstantBufferDesc = new BufferDescription() {
+					Usage = ResourceUsage.Dynamic,
+					BindFlags = BindFlags.ConstantBuffer,
+					SizeInBytes = vsConstantBufferBytes,
+					CpuAccessFlags = CpuAccessFlags.Write,
+					StructureByteStride = 0,
+					OptionFlags = 0,
+				};
+				vsConstantBuffer = new D3D11.Buffer(device,vsConstantBufferDesc);
+			}
+
+			if(psConstantBufferBytes>0) {
+				var psConstantBufferDesc = new BufferDescription() {
+					Usage = ResourceUsage.Dynamic,
+					BindFlags = BindFlags.ConstantBuffer,
+					SizeInBytes = psConstantBufferBytes,
+					CpuAccessFlags = CpuAccessFlags.Write,
+					StructureByteStride = 0,
+					OptionFlags = 0,
+				};
+				psConstantBuffer = new D3D11.Buffer(device,psConstantBufferDesc);
+			}
 		}
 
 		protected void fromFiles(string vsFilename,string psFilename) {
-			using(var vertexShaderByteCode = ShaderBytecode.CompileFromFile("Shaders/"+vsFilename,"main","vs_4_0",ShaderFlags.Debug)) {
-				vertexShader = new D3D11.VertexShader(device,vertexShaderByteCode);
-				inputSignature = ShaderSignature.GetInputSignature(vertexShaderByteCode);
-			}
+			vertexShaderByteCode = ShaderBytecode.CompileFromFile("Shaders/"+vsFilename,"main","vs_4_0",ShaderFlags.Debug);
+			vertexShader = new D3D11.VertexShader(device,vertexShaderByteCode);
+			inputSignature = ShaderSignature.GetInputSignature(vertexShaderByteCode);
+			
 			using(var pixelShaderByteCode = ShaderBytecode.CompileFromFile("Shaders/"+psFilename,"main","ps_4_0",ShaderFlags.Debug)) {
 				pixelShader = new D3D11.PixelShader(device,pixelShaderByteCode);
 			}
@@ -57,7 +63,7 @@ namespace RoomAliveTestApp {
 		}
 
 		protected void setInputElements(D3D11.InputElement[] elements) {
-			inputLayout = new D3D11.InputLayout(device,inputSignature,elements);
+			inputLayout = new D3D11.InputLayout(device,vertexShaderByteCode.Data,elements);
 		}
 
 		public void updateVSConstantBuffer<T>(T values) where T : struct {
@@ -93,8 +99,10 @@ namespace RoomAliveTestApp {
 		public void activate() {
 			context.VertexShader.Set(vertexShader);
 			context.PixelShader.Set(pixelShader);
-			context.VertexShader.SetConstantBuffer(0,vsConstantBuffer);
-			context.PixelShader.SetConstantBuffer(0,psConstantBuffer);
+			if(vsConstantBuffer!=null)
+				context.VertexShader.SetConstantBuffer(0,vsConstantBuffer);
+			if(psConstantBuffer!=null)
+				context.PixelShader.SetConstantBuffer(0,psConstantBuffer);
 			context.InputAssembler.InputLayout = inputLayout;
 		}
 

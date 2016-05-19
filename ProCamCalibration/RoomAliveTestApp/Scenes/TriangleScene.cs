@@ -19,12 +19,10 @@ namespace RoomAliveTestApp.Scenes {
 
 		private D3D11.Buffer triangleVertexBuffer;
 		private D3D11.VertexBufferBinding triangleBinding;
-		private Shaders.SingleColorShader singleColorShader;
 
 		protected override void PostInit() {
 			triangleVertexBuffer = D3D11.Buffer.Create<Vector3>(device,D3D11.BindFlags.VertexBuffer,triangleVertices);
 			triangleBinding = new D3D11.VertexBufferBinding(triangleVertexBuffer,Utilities.SizeOf<Vector3>(),0);
-			singleColorShader = new Shaders.SingleColorShader(device);
 		}
 
 		public override void OnDraw() {

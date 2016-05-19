@@ -19,7 +19,6 @@ namespace RoomAliveTestApp.Scenes {
 
 		private D3D11.Buffer quadVertexBuffer;
 		private D3D11.VertexBufferBinding quadBinding;
-		private SingleColorShader singleColorShader;
 		private D3D11.Buffer cubeVertexBuffer;
 		private D3D11.VertexBufferBinding cubeBinding;
 		private D3D11.Buffer cubeIndexBuffer;
@@ -32,8 +31,6 @@ namespace RoomAliveTestApp.Scenes {
 			cubeVertexBuffer = D3D11.Buffer.Create<Vector3>(device,D3D11.BindFlags.VertexBuffer,DefaultMeshes.centerCubeVertices);
 			cubeBinding = new D3D11.VertexBufferBinding(cubeVertexBuffer,Utilities.SizeOf<Vector3>(),0);
 			cubeIndexBuffer = D3D11.Buffer.Create<int>(device,D3D11.BindFlags.IndexBuffer,DefaultMeshes.cubeIndices);
-
-			singleColorShader = new SingleColorShader(device);
 		}
 
 		public override void OnDraw() {

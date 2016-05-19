@@ -28,10 +28,12 @@ namespace RoomAliveTestApp {
 		RenderSurface triangleSurface;
 		RenderSurface quadSurface;
 		RenderSurface meshSurface;
+		RenderSurface textureSurface;
 
 		private Scene triangleScene;
 		private Scene quadScene;
 		private Scene meshScene;
+		private Scene textureScene;
 
 
 		[STAThread]
@@ -68,19 +70,31 @@ namespace RoomAliveTestApp {
 				quadSurface.run();
 			})).Start();
 
+			if(false) {
+				new Thread(new ThreadStart(() => {
+					meshSurface = new RenderSurface(RenderCallback);
+					meshSurface.clearColor = new Color(45,45,45);
+					meshSurface.initWindowed("Mesh",800,600);
+
+					meshScene = new MeshScene();
+					meshScene.Init(meshSurface);
+
+					meshSurface.setInputCallback(this);
+					meshSurface.run();
+				})).Start();
+			}
+
 			new Thread(new ThreadStart(() => {
-				meshSurface = new RenderSurface(RenderCallback);
-				meshSurface.clearColor = new Color(45,45,45);
-				meshSurface.initWindowed("Mesh",800,600);
+				textureSurface = new RenderSurface(RenderCallback);
+				textureSurface.clearColor = new Color(15,15,45);
+				textureSurface.initWindowed("Texture",640,480);
 
-				meshScene = new MeshScene();
-				meshScene.Init(meshSurface);
+				textureScene = new TextureScene();
+				textureScene.Init(textureSurface);
 
-				meshSurface.setInputCallback(this);
-				meshSurface.run();
+				textureSurface.setInputCallback(this);
+				textureSurface.run();
 			})).Start();
-
-
 		}
 
 		private void RenderCallback(D3DDeviceContext context,RenderSurface sender) {
@@ -90,6 +104,8 @@ namespace RoomAliveTestApp {
 				quadScene.OnDraw();
 			if(sender==meshSurface)
 				meshScene.OnDraw();
+			if(sender==textureSurface)
+				textureScene.OnDraw();
 		}
 
 		public new void Dispose() {
@@ -99,6 +115,8 @@ namespace RoomAliveTestApp {
 			triangleScene.Dispose();
 			quadScene.Dispose();
 			meshScene.Dispose();
+			textureSurface.Dispose();
+			textureScene.Dispose();
 		}
 
 		public void RawEvent(InputEvent ev) {
@@ -108,6 +126,8 @@ namespace RoomAliveTestApp {
 				ev.handle(quadScene);
 			if(ev.sender==meshSurface)
 				ev.handle(meshScene);
+			if(ev.sender==textureSurface)
+				ev.handle(textureScene);
 		}
 
 		public void MouseDown(NormMouseEvent mouseEvent) {

@@ -1,4 +1,5 @@
 using RoomAliveTestApp;
+using RoomAliveTestApp.Shaders;
 using RoomAliveToolkit;
 using SharpDX;
 using SharpDX.WIC;
@@ -22,6 +23,8 @@ namespace SharpGraphics {
 		protected D3DDeviceContext context;
 		protected PointLight pointLight = new PointLight();
 
+		protected SingleColorShader singleColorShader;
+
 		protected SharpDX.Matrix mvp;
 		protected SharpDX.Matrix mvpTransp;
 
@@ -34,6 +37,7 @@ namespace SharpGraphics {
 			this.graphics = surface.graphics;
 			pointLight.position = new Vector3(0,2,0);
 			pointLight.Ia = new Vector3(0.1f,0.1f,0.1f);
+			singleColorShader = new SingleColorShader(device);
 			PostInit();
 		}
 

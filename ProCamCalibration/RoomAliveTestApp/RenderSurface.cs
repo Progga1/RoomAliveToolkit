@@ -85,28 +85,19 @@ namespace SharpGraphics {
 				renderTargetView = new D3D11.RenderTargetView(device,backBuffer);
 			}
 
-			context.OutputMerger.SetRenderTargets(renderTargetView);
 			viewport = new Viewport(0,0,width,height);
-			context.Rasterizer.SetViewport(viewport);
+
 
 			//--Init-depth--
-			var zBufferTextureDescription = new D3D11.Texture2DDescription {
-				Format = Format.D16_UNorm,
-				ArraySize = 1,
-				MipLevels = 1,
-				Width = getWidth(),
-				Height = getHeight(),
-				SampleDescription = new SampleDescription(1,0),
-				Usage = D3D11.ResourceUsage.Default,
-				BindFlags = D3D11.BindFlags.DepthStencil,
-				CpuAccessFlags = D3D11.CpuAccessFlags.None,
-				OptionFlags = D3D11.ResourceOptionFlags.None
-			};
-			using(var zBufferTexture = new Texture2D(device,zBufferTextureDescription))
-				depthStencilView = new DepthStencilView(device,zBufferTexture);
-			context.OutputMerger.SetTargets(depthStencilView,renderTargetView);
+			depthStencilView = SharpGraphics.createZBuffer(device,getWidth(),getHeight());
+			restoreRenderTargets();
 
 			graphics = new SharpGraphics(device);
+		}
+
+		internal void restoreRenderTargets() {
+			context.Rasterizer.SetViewport(viewport);
+			context.OutputMerger.SetTargets(depthStencilView,renderTargetView);
 		}
 
 		public void setOrthographicProjection(float zoom,float near,float far) {
