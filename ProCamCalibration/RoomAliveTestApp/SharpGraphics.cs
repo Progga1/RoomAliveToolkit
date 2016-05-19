@@ -29,6 +29,16 @@ namespace SharpGraphics {
 			}
 		}
 
+		public static D3D11.InputElement[] positionInputElements = new[] {
+			new D3D11.InputElement("POSITION",0,Format.R32G32B32_Float,0,0)
+		};
+
+		public static D3D11.InputElement[] posUVColorElements = new[] {
+			new D3D11.InputElement("POSITION",0,Format.R32G32B32_Float,0,0),
+			new D3D11.InputElement("TEXCOORD",0,Format.R32G32_Float,16,0),
+			new D3D11.InputElement("COLOR",0,Format.R32G32B32A32_Float,24,0)
+		};
+
 		public static ImagingFactory2 imagingFactory = new ImagingFactory2();
 
 		private Vector3[] positions = new Vector3[MAX_VERTICES];
@@ -198,11 +208,6 @@ namespace SharpGraphics {
 			//alternative: context.UpdateSubresource(indices,indexBuffer);
 
 			context.InputAssembler.SetIndexBuffer(indexBuffer,SharpDX.DXGI.Format.R32_UInt,0);
-			
-			if(false && posUVColorPos>0) {
-				positionPos = posUVColorPos;
-				posUVColorPos = 0;
-			}
 
 			if(positionPos>0) {
 				context.MapSubresource(positionBuffer,D3D11.MapMode.WriteDiscard,D3D11.MapFlags.None,out dataStream);
