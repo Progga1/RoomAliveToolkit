@@ -20,25 +20,10 @@ namespace RoomAliveTestApp.Scenes {
 
 	class TextureScene : VirtualSceneBase {
 
-		public Texture2D texture;
-		public SamplerState textureSampler;
-		public ShaderResourceView texResource;
+		public SharpTexture texture;
 
 		protected override void PostInit() {
-			texture = TextureLoader.CreateTexture2DFromBitmap(device,TextureLoader.LoadBitmap(GFX.imagingFactory,"Assets/cucco.png"));
-
-			// color sampler state
-			var samplerStateDesc = new SamplerStateDescription() {
-				Filter = Filter.MinMagMipLinear,
-				AddressU = TextureAddressMode.Wrap,
-				AddressV = TextureAddressMode.Wrap,
-				AddressW = TextureAddressMode.Wrap,
-				//BorderColor = new SharpDX.Color4(0.5f, 0.5f, 0.5f, 1.0f),
-				//BorderColor = new SharpDX.Color4(0, 0, 0, 1.0f),
-			};
-
-			texResource = new ShaderResourceView(device,texture);
-			textureSampler = new SamplerState(device,samplerStateDesc);
+			texture = new SharpTexture(device,"Assets/cucco.png");
 		}
 
 		public override void OnDraw() {
@@ -68,8 +53,7 @@ namespace RoomAliveTestApp.Scenes {
 
 			context.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
 
-			context.PixelShader.SetSampler(0,textureSampler);
-			context.PixelShader.SetShaderResource(0,texResource);
+			graphics.bindTexture(texture);
 
 			graphics.putIndicesQuad();
 			graphics.putPosUVColor(new Vector3(-s+off,s,0),new Vector2(0,0),new Vector4(1,1,1,1));

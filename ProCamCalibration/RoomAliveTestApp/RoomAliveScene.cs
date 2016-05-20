@@ -22,7 +22,7 @@ namespace RoomAliveTestApp {
 			public Vector3 position;
 
 			public Head() {
-				position = new Vector3(-1,-0.5f,-0.2f);
+				position = new Vector3(-0.6f,-0.5f,-0.2f);
 
 				projection = SharpMatrix.PerspectiveFovLH(1.2f,1.2f,0.05f,10);
 				//projection = GraphicsTransforms.PerspectiveFov(1.2f,1.2f,0.05f,10);

@@ -18,6 +18,8 @@ namespace SharpGraphics {
 
 	abstract class VirtualSceneBase : InputCallbacks,IDisposable {
 
+		public const float PI = 3.1415926535f;
+
 		protected RenderSurface surface;
 		protected GFX graphics;
 		protected D3DDevice device;

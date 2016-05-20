@@ -233,8 +233,9 @@ namespace SharpGraphics {
 			posUVColorVals[posUVColorPos++] = new PosUVColor(position,uv,color);
 		}
 
-		public void bindTexture(SamplerState texture) {
-			context.PixelShader.SetSampler(0,texture);
+		public void bindTexture(SharpTexture texture) {
+			context.PixelShader.SetSampler(0,texture.sampler);
+			context.PixelShader.SetShaderResource(0,texture.resource);
 		}
 
 		public void flush() {

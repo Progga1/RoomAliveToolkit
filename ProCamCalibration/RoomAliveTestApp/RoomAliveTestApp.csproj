@@ -35,7 +35,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>ProjectionMappingApp.ProjectionMappingApp</StartupObject>
+    <StartupObject>RoomAliveTestApp.TestApp</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="SharpDX, Version=2.6.3.0, Culture=neutral, publicKeyToken=null, processorArchitecture=MSIL">
@@ -76,6 +76,7 @@
     <Compile Include="SharpGraphics\RenderSurface.cs" />
     <Compile Include="RoomAliveScene.cs" />
     <Compile Include="RoomMesh.cs" />
+    <Compile Include="SharpGraphics\SharpTexture.cs" />
     <Compile Include="SharpGraphics\VirtualScene.cs" />
     <Compile Include="Scenes\MeshScene.cs" />
     <Compile Include="Scenes\QuadScene.cs" />

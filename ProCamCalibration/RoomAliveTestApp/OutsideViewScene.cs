@@ -21,7 +21,10 @@ namespace ProjectionMappingApp {
 		VirtualSceneBase virtualScene;
 
 		RoomAliveScene.Head head;
+		RoomAliveScene.HeadViewRendering headRendering;
 		ProjectorCameraEnsemble ensemble;
+
+		protected SharpMatrix vSceneWorldMat;
 
 		CameraControl cameraControl = new CameraControl();
 		RoomMesh rMesh;
@@ -43,6 +46,7 @@ namespace ProjectionMappingApp {
 
 			virtualScene = new QuadScene();
 			virtualScene.Init(surface);
+			headRendering = new RoomAliveScene.HeadViewRendering(roomScene,surface);
 		}
 
 		private void drawViewFrustum(SharpMatrix worldTransform,SharpMatrix projection,FloatColor color) {
@@ -107,7 +111,15 @@ namespace ProjectionMappingApp {
 
 			drawViewFrustum(head.getWorldTransformTransp(),head.getProjectionTransp(),new FloatColor(0.7f,0.1f,0.05f));
 
-			virtualScene.DrawContent(mvp);
+			vSceneWorldMat = SharpMatrix.RotationY(PI) * SharpMatrix.Scaling(0.3f) * SharpMatrix.Translation(0,0,2.5f);
+
+			SharpMatrix vMVP = vSceneWorldMat * mvp;
+
+			virtualScene.DrawContent(vMVP);
+
+			headRendering.beginRendering();
+			virtualScene.DrawContent(vMVP);
+			headRendering.endRendering();
 		}
 
 		public override void RawEvent(InputEvent ev) {
