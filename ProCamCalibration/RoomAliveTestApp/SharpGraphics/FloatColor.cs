@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RoomAliveTestApp {
+namespace SharpGraphics {
 
-	struct FloatColor {
+	public struct FloatColor {
 		public float r,g,b,a;
 
 		public FloatColor(float r,float g,float b) : this() {

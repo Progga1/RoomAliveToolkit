@@ -1,5 +1,4 @@
 using RoomAliveTestApp;
-using RoomAliveTestApp.Shaders;
 using RoomAliveToolkit;
 using SharpDX;
 using SharpDX.WIC;
@@ -9,24 +8,27 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using SharpMatrix = SharpDX.Matrix;
 using D3D11 = SharpDX.Direct3D11;
 using D3DDevice = SharpDX.Direct3D11.Device;
 using D3DDeviceContext = SharpDX.Direct3D11.DeviceContext;
+using SharpGraphics.Shaders;
 
 namespace SharpGraphics {
 
-	abstract class Scene : InputCallbacks,IDisposable {
+	abstract class VirtualSceneBase : InputCallbacks,IDisposable {
 
 		protected RenderSurface surface;
-		protected SharpGraphics graphics;
+		protected GFX graphics;
 		protected D3DDevice device;
 		protected D3DDeviceContext context;
 		protected PointLight pointLight = new PointLight();
 
-		protected SingleColorShader singleColorShader;
-
 		protected SharpDX.Matrix mvp;
 		protected SharpDX.Matrix mvpTransp;
+
+		protected SingleColorShader singleColorShader;
+		protected PosUVColorShader posUVColorShader;
 
 		protected abstract void PostInit();
 
@@ -37,7 +39,8 @@ namespace SharpGraphics {
 			this.graphics = surface.graphics;
 			pointLight.position = new Vector3(0,2,0);
 			pointLight.Ia = new Vector3(0.1f,0.1f,0.1f);
-			singleColorShader = new SingleColorShader(device);
+			singleColorShader = graphics.singleColorShader;
+			posUVColorShader = graphics.posUVColorShader;
 			PostInit();
 		}
 
@@ -56,6 +59,10 @@ namespace SharpGraphics {
 			this.mvp = mvp;
 			this.mvpTransp = mvp;
 			this.mvpTransp.Transpose();
+		}
+
+		public virtual void DrawContent(SharpMatrix mvpMat) {
+
 		}
 
 		public virtual void OnDraw() {

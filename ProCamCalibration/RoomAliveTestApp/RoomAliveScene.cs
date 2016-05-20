@@ -1,7 +1,7 @@
 using RoomAliveToolkit;
 using SharpDX;
 using SharpGraphics;
-using GFX = SharpGraphics.SharpGraphics;
+using GFX = SharpGraphics.GFX;
 using System;
 using System.Collections.Generic;
 using System.Linq;

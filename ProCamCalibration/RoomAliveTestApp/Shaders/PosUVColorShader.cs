@@ -6,11 +6,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using D3D11 = SharpDX.Direct3D11;
-using GFX = SharpGraphics.SharpGraphics;
+using GFX = SharpGraphics.GFX;
 
-namespace RoomAliveTestApp.Shaders {
+namespace SharpGraphics.Shaders {
 
-	class PosUVColorShader : ShaderBase {
+	public class PosUVColorShader : ShaderBase {
 
 		protected FloatColor color = new FloatColor();
 

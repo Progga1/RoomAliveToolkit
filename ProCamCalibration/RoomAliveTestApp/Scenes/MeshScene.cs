@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace RoomAliveTestApp.Scenes {
 
-	class MeshScene : Scene {
+	class MeshScene : VirtualSceneBase {
 
 		RoomMesh rMesh;
 		private CameraControl cameraControl = new CameraControl();

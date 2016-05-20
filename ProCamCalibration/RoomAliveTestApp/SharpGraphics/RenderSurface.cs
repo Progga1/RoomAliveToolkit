@@ -25,7 +25,7 @@ namespace SharpGraphics {
 		public float ratioX { get; private set; }
 		public SharpDX.Color clearColor = new SharpDX.Color(5,5,60);
 
-		public SharpGraphics graphics;
+		public GFX graphics;
 
 		//Callbacks
 		private Action<D3DDeviceContext,RenderSurface> OnDraw;
@@ -89,10 +89,10 @@ namespace SharpGraphics {
 
 
 			//--Init-depth--
-			depthStencilView = SharpGraphics.createZBuffer(device,getWidth(),getHeight());
+			depthStencilView = GFX.createZBuffer(device,getWidth(),getHeight());
 			restoreRenderTargets();
 
-			graphics = new SharpGraphics(device);
+			graphics = new GFX(device);
 		}
 
 		internal void restoreRenderTargets() {

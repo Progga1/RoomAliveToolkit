@@ -1,4 +1,3 @@
-using RoomAliveTestApp.Shaders;
 using SharpDX;
 using SharpDX.Direct3D;
 using SharpDX.DXGI;
@@ -10,12 +9,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using D3D11 = SharpDX.Direct3D11;
+using SharpMatrix = SharpDX.Matrix;
 using D3DDevice = SharpDX.Direct3D11.Device;
 using D3DDeviceContext = SharpDX.Direct3D11.DeviceContext;
 
 namespace RoomAliveTestApp.Scenes {
 
-	class QuadScene : Scene {
+	class QuadScene : VirtualSceneBase {
 
 		private D3D11.Buffer quadVertexBuffer;
 		private D3D11.VertexBufferBinding quadBinding;
@@ -33,19 +33,12 @@ namespace RoomAliveTestApp.Scenes {
 			cubeIndexBuffer = D3D11.Buffer.Create<int>(device,D3D11.BindFlags.IndexBuffer,DefaultMeshes.cubeIndices);
 		}
 
-		public override void OnDraw() {
-			base.OnDraw();
-			SharpDX.Matrix viewMat = cameraControl.getViewMatrix();
-			surface.setOrthographicProjection(cameraControl.distance,-1,100);
-			surface.setPerspectiveProjection(1.4f,0.01f,10);
-
-			SharpDX.Matrix projMat = surface.getProjectionMatrix();
-			SharpDX.Matrix mvpMat = viewMat * projMat;
+		public override void DrawContent(SharpMatrix mvpMat) {
 			mvpMat.Transpose();
 			singleColorShader.activate();
 			singleColorShader.updateVSConstantBuffer(mvpMat);
 
-			singleColorShader.passColor(1,0,0,1);
+			graphics.singleColorShader.passColor(1,0,0,1);
 			context.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleStrip;
 			context.InputAssembler.SetVertexBuffers(0,quadBinding);
 			context.Draw(4,0);
@@ -63,15 +56,20 @@ namespace RoomAliveTestApp.Scenes {
 			graphics.putIndex(1);
 			context.InputAssembler.PrimitiveTopology = PrimitiveTopology.LineList;
 			graphics.flush();
+		}
 
+		public override void OnDraw() {
+			SharpMatrix viewMat = cameraControl.getViewMatrix();
+			surface.setOrthographicProjection(cameraControl.distance,-1,100);
+			surface.setPerspectiveProjection(1.4f,0.01f,10);
+
+			SharpMatrix projMat = surface.getProjectionMatrix();
+			SharpMatrix mvpMat = viewMat * projMat;
+			DrawContent(mvpMat);
 		}
 
 		public override void RawEvent(InputEvent ev) {
 			ev.handle(cameraControl);
-		}
-
-		public override void Dispose() {
-			singleColorShader.Dispose();
 		}
 
 	}

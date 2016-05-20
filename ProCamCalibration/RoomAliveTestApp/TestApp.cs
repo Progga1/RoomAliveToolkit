@@ -17,7 +17,6 @@ using SharpGraphics;
 
 using RoomAliveToolkit;
 using System.Runtime.InteropServices;
-using RoomAliveTestApp.Shaders;
 using System.Threading;
 using RoomAliveTestApp.Scenes;
 
@@ -30,10 +29,10 @@ namespace RoomAliveTestApp {
 		RenderSurface meshSurface;
 		RenderSurface textureSurface;
 
-		private Scene triangleScene;
-		private Scene quadScene;
-		private Scene meshScene;
-		private Scene textureScene;
+		private VirtualSceneBase triangleScene;
+		private VirtualSceneBase quadScene;
+		private VirtualSceneBase meshScene;
+		private VirtualSceneBase textureScene;
 
 
 		[STAThread]

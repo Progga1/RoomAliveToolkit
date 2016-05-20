@@ -65,28 +65,29 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CameraControl.cs" />
+    <Compile Include="SharpGraphics\CameraControl.cs" />
+    <Compile Include="Scenes\CubeProjectionScene.cs" />
     <Compile Include="DefaultMeshes.cs" />
-    <Compile Include="FloatColor.cs" />
-    <Compile Include="InputCallbacks.cs" />
-    <Compile Include="MatrixOps.cs" />
+    <Compile Include="SharpGraphics\FloatColor.cs" />
+    <Compile Include="SharpGraphics\InputCallbacks.cs" />
+    <Compile Include="SharpGraphics\MatrixOps.cs" />
     <Compile Include="OutsideViewScene.cs" />
     <Compile Include="ProjectionMappingApp.cs" />
-    <Compile Include="RenderSurface.cs" />
+    <Compile Include="SharpGraphics\RenderSurface.cs" />
     <Compile Include="RoomAliveScene.cs" />
     <Compile Include="RoomMesh.cs" />
-    <Compile Include="Scene.cs" />
+    <Compile Include="SharpGraphics\VirtualScene.cs" />
     <Compile Include="Scenes\MeshScene.cs" />
     <Compile Include="Scenes\QuadScene.cs" />
     <Compile Include="Scenes\TextureScene.cs" />
     <Compile Include="Scenes\TriangleScene.cs" />
-    <Compile Include="ShaderBase.cs" />
+    <Compile Include="SharpGraphics\ShaderBase.cs" />
     <Compile Include="Shaders\PosUVColorShader.cs" />
     <Compile Include="Shaders\SingleColorShader.cs" />
-    <Compile Include="SharpGraphics.cs" />
+    <Compile Include="SharpGraphics\SharpGraphics.cs" />
     <Compile Include="TestApp.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TextureLoader.cs" />
+    <Compile Include="SharpGraphics\TextureLoader.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

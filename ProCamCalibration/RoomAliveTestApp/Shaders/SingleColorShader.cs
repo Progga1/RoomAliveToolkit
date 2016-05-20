@@ -1,3 +1,4 @@
+using RoomAliveTestApp;
 using SharpDX;
 using SharpDX.DXGI;
 using System;
@@ -6,11 +7,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using D3D11 = SharpDX.Direct3D11;
-using GFX = SharpGraphics.SharpGraphics;
+using GFX = SharpGraphics.GFX;
 
-namespace RoomAliveTestApp.Shaders {
+namespace SharpGraphics.Shaders {
 
-	class SingleColorShader : ShaderBase {
+	public class SingleColorShader : ShaderBase {
 
 		protected FloatColor color = new FloatColor();
 

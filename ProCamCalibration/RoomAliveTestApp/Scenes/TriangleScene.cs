@@ -13,7 +13,7 @@ using D3DDeviceContext = SharpDX.Direct3D11.DeviceContext;
 
 namespace RoomAliveTestApp.Scenes {
 
-	class TriangleScene : Scene {
+	class TriangleScene : VirtualSceneBase {
 
 		private Vector3[] triangleVertices = new Vector3[] { new Vector3(-0.5f,0.5f,0.0f),new Vector3(0.5f,0.5f,0.0f),new Vector3(0.0f,-0.5f,0.0f) };
 
@@ -34,11 +34,6 @@ namespace RoomAliveTestApp.Scenes {
 			context.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
 			context.InputAssembler.SetVertexBuffers(0,triangleBinding);
 			context.Draw(3,0);
-		}
-
-		public override void Dispose() {
-			base.Dispose();
-			triangleVertexBuffer.Dispose();
 		}
 
 		public override void MouseDrag(NormMouseEvent ev) {

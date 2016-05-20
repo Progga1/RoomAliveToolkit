@@ -7,9 +7,9 @@ using System.Text;
 using System.Threading.Tasks;
 using D3D11 = SharpDX.Direct3D11;
 
-namespace RoomAliveTestApp {
+namespace SharpGraphics {
 
-	class ShaderBase : IDisposable {
+	public class ShaderBase : IDisposable {
 
 		public static int SIZE_F = 4;
 

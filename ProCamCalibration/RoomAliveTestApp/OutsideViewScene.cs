@@ -1,5 +1,5 @@
 using RoomAliveTestApp;
-using RoomAliveTestApp.Shaders;
+using RoomAliveTestApp.Scenes;
 using RoomAliveToolkit;
 using SharpDX;
 using SharpDX.Direct3D;
@@ -15,13 +15,13 @@ using SharpMatrix = SharpDX.Matrix;
 
 namespace ProjectionMappingApp {
 
-	class OutsideViewScene : Scene {
+	class OutsideViewScene : VirtualSceneBase {
 
 		RoomAliveScene roomScene;
+		VirtualSceneBase virtualScene;
+
 		RoomAliveScene.Head head;
 		ProjectorCameraEnsemble ensemble;
-
-		private SingleColorShader singleColorShader;
 
 		CameraControl cameraControl = new CameraControl();
 		RoomMesh rMesh;
@@ -38,9 +38,11 @@ namespace ProjectionMappingApp {
 		}
 
 		protected override void PostInit() {
-			singleColorShader = new SingleColorShader(device);
 			rMesh = new RoomMesh(device).setMesh(roomScene.roomMesh);
 			cameraControl.distance = 5;
+
+			virtualScene = new QuadScene();
+			virtualScene.Init(surface);
 		}
 
 		private void drawViewFrustum(SharpMatrix worldTransform,SharpMatrix projection,FloatColor color) {
@@ -105,17 +107,7 @@ namespace ProjectionMappingApp {
 
 			drawViewFrustum(head.getWorldTransformTransp(),head.getProjectionTransp(),new FloatColor(0.7f,0.1f,0.05f));
 
-			if(false) {
-				singleColorShader.activate();
-				singleColorShader.updateVSConstantBuffer(mvpTransp);
-				singleColorShader.passColor(0,1,0,1);
-				graphics.putPos(1,1,1);
-				graphics.putPos(-1,0.5f,1);
-				graphics.putIndex(0);
-				graphics.putIndex(1);
-				context.InputAssembler.PrimitiveTopology = PrimitiveTopology.LineList;
-				graphics.flush();
-			}
+			virtualScene.DrawContent(mvp);
 		}
 
 		public override void RawEvent(InputEvent ev) {
@@ -125,6 +117,7 @@ namespace ProjectionMappingApp {
 
 		public override void Dispose() {
 			singleColorShader.Dispose();
+			virtualScene.Dispose();
 		}
 
 		public override void KeyDown(KeyEvent ev) {

@@ -6,24 +6,23 @@ using System.Text;
 using System.Threading.Tasks;
 
 using SharpDX.Direct3D11;
-using GFX = SharpGraphics.SharpGraphics;
+using GFX = SharpGraphics.GFX;
 using D3D11 = SharpDX.Direct3D11;
 using D3DDevice = SharpDX.Direct3D11.Device;
 using D3DDeviceContext = SharpDX.Direct3D11.DeviceContext;
 using CommonDX;
-using RoomAliveTestApp.Shaders;
 using SharpDX.Direct3D;
 using SharpDX;
 using SharpDX.WIC;
+using SharpGraphics.Shaders;
 
 namespace RoomAliveTestApp.Scenes {
 
-	class TextureScene : Scene {
+	class TextureScene : VirtualSceneBase {
 
 		public Texture2D texture;
 		public SamplerState textureSampler;
 		public ShaderResourceView texResource;
-		public PosUVColorShader posUVColorShader;
 
 		protected override void PostInit() {
 			texture = TextureLoader.CreateTexture2DFromBitmap(device,TextureLoader.LoadBitmap(GFX.imagingFactory,"Assets/cucco.png"));
@@ -40,9 +39,6 @@ namespace RoomAliveTestApp.Scenes {
 
 			texResource = new ShaderResourceView(device,texture);
 			textureSampler = new SamplerState(device,samplerStateDesc);
-
-			posUVColorShader = new PosUVColorShader(device);
-			
 		}
 
 		public override void OnDraw() {

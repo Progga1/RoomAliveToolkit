@@ -11,10 +11,11 @@ using SharpDX.Direct3D11;
 using D3D11 = SharpDX.Direct3D11;
 using D3DDevice = SharpDX.Direct3D11.Device;
 using D3DDeviceContext = SharpDX.Direct3D11.DeviceContext;
+using SharpGraphics.Shaders;
 
 namespace SharpGraphics {
 
-	public class SharpGraphics {
+	public class GFX : IDisposable {
 
 		const int MAX_VERTICES = 100000;
 
@@ -39,6 +40,9 @@ namespace SharpGraphics {
 			new D3D11.InputElement("TEXCOORD",0,Format.R32G32_Float,12,0),
 			new D3D11.InputElement("COLOR",0,Format.R32G32B32A32_Float,20,0)
 		};
+
+		public SingleColorShader singleColorShader { get; private set; }
+		public PosUVColorShader posUVColorShader { get; private set; }
 
 		public static ImagingFactory2 imagingFactory = new ImagingFactory2();
 
@@ -82,7 +86,7 @@ namespace SharpGraphics {
 				return new D3D11.DepthStencilView(device,zBufferTexture);
 		}
 
-		public SharpGraphics(D3DDevice device) {
+		public GFX(D3DDevice device) {
 			this.device = device;
 			this.context = device.ImmediateContext;
 
@@ -139,7 +143,6 @@ namespace SharpGraphics {
 			depthDisabledState = new DepthStencilState(device,new DepthStencilStateDescription { });
 			setDepthEnabled(true);
 
-
 			//--Init-blending
 			var blendDesc = new RenderTargetBlendDescription(
 					true,
@@ -152,8 +155,11 @@ namespace SharpGraphics {
 					ColorWriteMaskFlags.All);
 			var blendDescription = new BlendStateDescription();
 			blendDescription.RenderTarget[0] = blendDesc;
-
 			defaultBlendState = new BlendState(device,blendDescription);
+
+			//--Init-shaders--
+			singleColorShader = new SingleColorShader(device);
+			posUVColorShader = new PosUVColorShader(device);
 		}
 
 		public void setDepthEnabled(bool enabled) {
@@ -269,6 +275,13 @@ namespace SharpGraphics {
 			indexPos = 0;
 		}
 
+		public void Dispose() {
+			singleColorShader.Dispose();
+			posUVColorShader.Dispose();
+			positionBuffer.Dispose();
+			posUVColorBuffer.Dispose();
+			indexBuffer.Dispose();
+		}
 	}
 
 }
