@@ -103,6 +103,7 @@ namespace RoomAliveTestApp {
 				renderTargetView = new RenderTargetView(device,userViewRenderTarget);
 
 				texture = new SharpTexture(device,userViewRenderTarget);
+				texture.initSampler(TextureAddressMode.Clamp,Filter.MinMagMipLinear);
 
 				depthStencilView = GFX.createZBuffer(device,textureWidth,textureHeight);
 

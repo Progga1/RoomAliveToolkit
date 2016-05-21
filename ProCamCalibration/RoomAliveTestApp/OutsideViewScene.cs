@@ -143,7 +143,7 @@ namespace ProjectionMappingApp {
 			}
 			drawViewFrustum(head.getViewTransp(),head.getProjectionTransp(),new FloatColor(0.7f,0.1f,0.05f));
 
-			vSceneWorldMat = SharpMatrix.RotationY(PI) * SharpMatrix.Scaling(0.3f) * SharpMatrix.Translation(0,0,2.5f);
+			vSceneWorldMat = SharpMatrix.RotationY(PI) * SharpMatrix.Scaling(0.6f,1.2f,0.6f) * SharpMatrix.Translation(0,0,2.5f);
 
 			SharpMatrix vMVP = vSceneWorldMat * mvp;
 
@@ -182,6 +182,7 @@ namespace ProjectionMappingApp {
 			projMapShader.activate();
 			projMapShader.passTransformations(m,vp,userVP);
 			projMapShader.passColor(0.8f,0.8f,1,1);
+			graphics.bindTexture(headRendering.texture);
 
 //			setMVP(m*vp);
 //			singleColorShader.activate();

@@ -9,6 +9,7 @@ using SharpDX.Direct3D11;
 using D3D11 = SharpDX.Direct3D11;
 using D3DDevice = SharpDX.Direct3D11.Device;
 using D3DDeviceContext = SharpDX.Direct3D11.DeviceContext;
+using SharpDX;
 
 namespace SharpGraphics {
 
@@ -37,6 +38,21 @@ namespace SharpGraphics {
 				AddressU = addressU,
 				AddressV = addressV,
 				AddressW = TextureAddressMode.Wrap
+			};
+			sampler = new SamplerState(device,samplerStateDesc);
+		}
+
+		public void initSampler(TextureAddressMode address,Filter filter) {
+			initSampler(address,address,filter);
+		}
+
+		public void initSampler(Color borderColor,Filter filter) {
+			// color sampler state
+			var samplerStateDesc = new SamplerStateDescription() {
+				Filter = filter,
+				AddressU = TextureAddressMode.Border,
+				AddressV = TextureAddressMode.Border,
+				BorderColor = borderColor
 			};
 			sampler = new SamplerState(device,samplerStateDesc);
 		}
