@@ -47,8 +47,8 @@ namespace RoomAliveToolkit
             renderTarget = Texture2D.FromSwapChain<Texture2D>(swapChain, 0);
             renderTargetView = new RenderTargetView(device, renderTarget);
 
-            // depth buffer
-            var depthBufferDesc = new Texture2DDescription()
+			// depth buffer
+			var depthBufferDesc = new Texture2DDescription()
             {
                 Width = videoPanel1.Width,
                 Height = videoPanel1.Height,
@@ -60,7 +60,7 @@ namespace RoomAliveToolkit
                 BindFlags = BindFlags.DepthStencil,
                 CpuAccessFlags = CpuAccessFlags.None
             };
-            depthStencil = new Texture2D(device, depthBufferDesc);
+            depthStencil = new Texture2D(device,depthBufferDesc);
             depthStencilView = new DepthStencilView(device, depthStencil);
 
             // viewport

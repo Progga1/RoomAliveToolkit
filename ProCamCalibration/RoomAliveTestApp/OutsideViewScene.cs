@@ -3,6 +3,8 @@ using RoomAliveTestApp.Scenes;
 using RoomAliveToolkit;
 using SharpDX;
 using SharpDX.Direct3D;
+using SharpDX.Direct3D11;
+using SharpDX.DXGI;
 using SharpGraphics;
 using System;
 using System.Collections.Generic;
@@ -23,6 +25,8 @@ namespace ProjectionMappingApp {
 		RoomAliveScene.Head head;
 		RoomAliveScene.HeadViewRendering headRendering;
 		ProjectorCameraEnsemble ensemble;
+
+		private ProjectorForm projectorForm;
 
 		SharpTexture cubeTex;
 
@@ -51,6 +55,13 @@ namespace ProjectionMappingApp {
 			headRendering = new RoomAliveScene.HeadViewRendering(roomScene,surface);
 
 			cubeTex = new SharpTexture(device,"Assets/cube.png");
+
+			//--Init-projector--
+			var factory = new Factory1();
+			projectorForm = new ProjectorForm(factory,device,new object(),ensemble.projectors[0]);
+			projectorForm.FullScreen = false; // TODO: fix this so can be called after Show
+			projectorForm.ClientSize = new System.Drawing.Size(640,480);
+			projectorForm.Show();
 		}
 
 		private void drawViewFrustum(SharpMatrix worldTransform,SharpMatrix projection,FloatColor color) {
@@ -94,6 +105,7 @@ namespace ProjectionMappingApp {
 		public override void OnDraw() {
 			base.OnDraw();
 			graphics.setDepthEnabled(true);
+			context.Rasterizer.State = graphics.defaultRasterizerState;
 
 			surface.setOrthographicProjection(cameraControl.distance,-1,100);
 			surface.setPerspectiveProjection(1.2f,0.01f,30);
@@ -124,13 +136,9 @@ namespace ProjectionMappingApp {
 			virtualScene.DrawContent(vMVP);
 
 			headRendering.beginRendering();
-			Console.WriteLine("D");
-			Console.WriteLine(head.getWorldTransform());
-			Console.WriteLine(head.getView());
 			vMVP = vSceneWorldMat * head.getView() * head.projMat;
 			virtualScene.DrawContent(vMVP);
 			headRendering.endRendering();
-
 			
 			graphics.setDepthEnabled(false);
 			surface.setOrthographicProjection();
@@ -145,6 +153,10 @@ namespace ProjectionMappingApp {
 			graphics.putRectPosUVColor(-surface.ratioX,-1+s,s*headRendering.getRatioX(),s, new Vector4(1,1,1,0.5f));
 			graphics.flush();
 
+			context.ClearRenderTargetView(projectorForm.renderTargetView,Color4.Black);
+			context.ClearDepthStencilView(projectorForm.depthStencilView,DepthStencilClearFlags.Depth,1,0);
+
+			projectorForm.swapChain.Present(0,PresentFlags.None);
 		}
 
 		public override void RawEvent(InputEvent ev) {
@@ -159,10 +171,11 @@ namespace ProjectionMappingApp {
 		public override void KeyDown(KeyEvent ev) {
 			base.KeyDown(ev);
 			const float HEAD_STEP = 0.1f;
+			//Rotate 180� -> inv X
 			if(ev.code==Keys.D)
-				head.position.X += HEAD_STEP;
-			if(ev.code==Keys.A)
 				head.position.X -= HEAD_STEP;
+			if(ev.code==Keys.A)
+				head.position.X += HEAD_STEP;
 			if(ev.code==Keys.W)
 				head.position.Y += HEAD_STEP;
 			if(ev.code==Keys.S)

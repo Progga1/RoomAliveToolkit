@@ -99,6 +99,7 @@ namespace SharpGraphics {
 //				IsMultisampleEnabled = true,
 			};
 			defaultRasterizerState = new RasterizerState(device,rasterizerStateDesc);
+			context.Rasterizer.State = defaultRasterizerState;
 
 			//--Init-buffers--
 			var indexBufferDesc = new BufferDescription() {
