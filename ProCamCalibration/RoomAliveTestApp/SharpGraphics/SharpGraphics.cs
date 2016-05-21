@@ -11,6 +11,7 @@ using SharpDX.Direct3D11;
 using D3D11 = SharpDX.Direct3D11;
 using D3DDevice = SharpDX.Direct3D11.Device;
 using D3DDeviceContext = SharpDX.Direct3D11.DeviceContext;
+using SharpMatrix = SharpDX.Matrix;
 using SharpGraphics.Shaders;
 using RoomAliveToolkit;
 
@@ -178,6 +179,13 @@ namespace SharpGraphics {
 				indices[indexPos++] = positionPos;
 				positions[positionPos++] = new Vector3(elem.position.X,elem.position.Y,elem.position.Z);
 			}
+		}
+
+		public static void projectionNormToTexCoords(ref SharpMatrix projMat) {
+			projMat[0,0] /= 2;
+			projMat[1,1] /= -2;
+			projMat[2,0] += 0.5f; //obligue, implicit 0.5*z/w, wheras w=z
+			projMat[2,1] += 0.5f;
 		}
 
 		public void putPos(Vector3 pos) {

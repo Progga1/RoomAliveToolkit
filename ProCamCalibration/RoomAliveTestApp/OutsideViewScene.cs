@@ -173,14 +173,10 @@ namespace ProjectionMappingApp {
 			context.OutputMerger.SetRenderTargets(projectorForm.depthStencilView,projectorForm.renderTargetView);
 			context.Rasterizer.SetViewport(projectorForm.viewport);
 
-			var m = SharpMatrix.Identity;
-			var vp = projectorForm.view * projectorForm.projection;
-			var userVP = head.getView() * head.getProjection();
-
 			context.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
 
 			projMapShader.activate();
-			projMapShader.passTransformations(m,vp,userVP);
+			projMapShader.passTransformations(SharpMatrix.Identity,projectorForm.view * projectorForm.projection,head.getView(),head.getProjection());
 			projMapShader.passColor(0.8f,0.8f,1,1);
 			graphics.bindTexture(headRendering.texture);
 

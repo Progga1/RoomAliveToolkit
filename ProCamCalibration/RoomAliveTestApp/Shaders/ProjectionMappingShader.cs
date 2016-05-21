@@ -14,31 +14,29 @@ namespace SharpGraphics.Shaders {
 
 	public class ProjectionMappingShader : ShaderBase {
 
-		[StructLayout(LayoutKind.Explicit,Size = 64*3)]
+		[StructLayout(LayoutKind.Explicit,Size = 64*2)]
 		public unsafe struct VSConstants {
 			[FieldOffset(0)]
-			public SharpMatrix m;
+			public SharpMatrix mvpProjector;
 			[FieldOffset(64)]
-			public SharpMatrix vp;
-			[FieldOffset(128)]
-			public SharpMatrix userVP;
+			public SharpMatrix mvpUser;
 		}
 
 		protected FloatColor color = new FloatColor();
 
-		public ProjectionMappingShader(D3D11.Device device) : base(device,3*16*4,4*4) {
+		public ProjectionMappingShader(D3D11.Device device) : base(device,2*16*4,4*4) {
 			base.fromFiles("projectionMappingVS.hlsl","projectionMappingPS.hlsl");
 			base.setInputElements(GFX.positionInputElements);
 		}
 
-		public void passTransformations(SharpMatrix m,SharpMatrix vp,SharpMatrix userVP) {
+		public void passTransformations(SharpMatrix m,SharpMatrix projVP,SharpMatrix userV,SharpMatrix userP) {
 			var cb = new VSConstants();
-			m.Transpose();
-			vp.Transpose();
-			userVP.Transpose();
-			cb.m = m;
-			cb.vp = vp;
-			cb.userVP = userVP;
+
+			GFX.projectionNormToTexCoords(ref userP);
+			cb.mvpProjector = m * projVP;
+			cb.mvpUser = m * userV * userP;
+			cb.mvpProjector.Transpose();
+			cb.mvpUser.Transpose();
 			base.updateVSConstantBuffer(cb);
 		}
 

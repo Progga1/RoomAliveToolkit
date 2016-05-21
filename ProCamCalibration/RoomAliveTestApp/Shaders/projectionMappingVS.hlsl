@@ -1,7 +1,6 @@
 cbuffer constants : register(b0) {
-	matrix m;
-	matrix vp;
-	matrix userVP;
+	matrix mvpProjector;
+	matrix mvpUser;
 }
 
 struct vertex_in
@@ -12,14 +11,15 @@ struct vertex_in
 struct vertex_out
 {
 	float4 pos : SV_POSITION;
-	float4 posWorld : TEXCOORD;
+	float2 texCoords : TEXCOORD;
 	float4 color: COLOR;
 };
 
 vertex_out main(vertex_in i) {
 	vertex_out o = (vertex_out)0;
-	o.pos = mul(i.pos, mul(vp,m));
-	o.posWorld = mul(i.pos, mul(userVP, m));
+	o.pos = mul(i.pos, mvpProjector);
+	float4 userProj = mul(i.pos, mvpUser);
+	o.texCoords = userProj.xy / userProj.w;
 	o.color = float4(1.0,1.0,1.0,1.0);
 	return o;
 }

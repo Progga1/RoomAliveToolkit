@@ -23,12 +23,12 @@ namespace RoomAliveTestApp {
 		public class Head {
 			public SharpMatrix projMat;
 			public Vector3 position;
-			public float yaw = PI, pitch = 0;
+			public float yaw = 0, pitch = 0;
 
 			public Head() {
 				position = new Vector3(-0.6f,-0.5f,-0.2f);
 
-				projMat = SharpMatrix.PerspectiveFovRH(1.2f,1.2f,0.05f,10);
+				projMat = SharpMatrix.PerspectiveFovLH(1.2f,1.2f,0.05f,10);
 			}
 
 			public SharpMatrix getView() {
