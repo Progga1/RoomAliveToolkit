@@ -20,6 +20,7 @@ namespace RoomAliveTestApp {
 
 		static ImagingFactory2 imagingFactory = new ImagingFactory2();
 
+		public Mesh mesh;
 		public MeshShader meshShader;
 		public MeshDeviceResources meshDeviceResources;
 
@@ -29,7 +30,7 @@ namespace RoomAliveTestApp {
 		}
 
 		public RoomMesh loadObj(string filename) {
-			var mesh = new Mesh();
+			mesh = new Mesh();
 			mesh.flipTexY = flipTexY;
 			mesh.LoadFromOBJFile(filename);
 			meshShader = new MeshShader(device);
@@ -38,6 +39,7 @@ namespace RoomAliveTestApp {
 		}
 
 		public RoomMesh setMesh(Mesh mesh) {
+			this.mesh = mesh;
 			flipTexY = mesh.flipTexY;
 			meshShader = new MeshShader(device);
 			meshDeviceResources = new MeshDeviceResources(device,imagingFactory,mesh);

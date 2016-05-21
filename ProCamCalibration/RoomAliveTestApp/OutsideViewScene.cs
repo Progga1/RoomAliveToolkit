@@ -6,6 +6,7 @@ using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using SharpGraphics;
+using SharpGraphics.Shaders;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,6 +28,7 @@ namespace ProjectionMappingApp {
 		ProjectorCameraEnsemble ensemble;
 
 		private ProjectorForm projectorForm;
+		private ProjectionMappingShader projMapShader;
 
 		SharpTexture cubeTex;
 
@@ -48,7 +50,9 @@ namespace ProjectionMappingApp {
 
 		protected override void PostInit() {
 			rMesh = new RoomMesh(device).setMesh(roomScene.roomMesh);
-			cameraControl.distance = 5;
+			cameraControl.distance = 4;
+			cameraControl.position.Z = 2.4f;
+			cameraControl.alpha = PI;
 
 			virtualScene = new QuadScene();
 			virtualScene.Init(surface);
@@ -62,6 +66,8 @@ namespace ProjectionMappingApp {
 			projectorForm.FullScreen = false; // TODO: fix this so can be called after Show
 			projectorForm.ClientSize = new System.Drawing.Size(640,480);
 			projectorForm.Show();
+
+			projMapShader = new ProjectionMappingShader(device);
 		}
 
 		private void drawViewFrustum(SharpMatrix worldTransform,SharpMatrix projection,FloatColor color) {
@@ -114,9 +120,18 @@ namespace ProjectionMappingApp {
 			SharpMatrix viewMat = cameraControl.getViewMatrix();
 			setMVP(viewMat*projMat);
 
-			rMesh.meshShader.SetVertexShaderConstants(context,SharpMatrix.Identity,mvp,pointLight.position);
+			//rMesh.meshShader.SetVertexShaderConstants(context,SharpMatrix.Identity,mvp,pointLight.position);
 			//rMesh.meshShader.Render(context,rMesh.meshDeviceResources,pointLight,null,null,surface.viewport);
 
+			if(false) {
+				singleColorShader.activate();
+				singleColorShader.passColor(new FloatColor(1,0.5f,0,1));
+				singleColorShader.updateVSConstantBuffer(mvpTransp);
+				graphics.putPositionsMesh(rMesh.mesh);
+				graphics.flush();
+			}
+
+			//--Draw-frustums--
 			viewMat = cameraControl.getViewMatrix();
 			projMat = surface.getProjectionMatrix();
 			foreach(var projector in ensemble.projectors) {
@@ -126,7 +141,6 @@ namespace ProjectionMappingApp {
 			foreach(var camera in ensemble.cameras) {
 				drawViewFrustum(camera.pose,camera.calibration.depthCameraMatrix,new FloatColor(0.2f,0.2f,0.6f),512,424,0.5f,4.5f);
 			}
-
 			drawViewFrustum(head.getViewTransp(),head.getProjectionTransp(),new FloatColor(0.7f,0.1f,0.05f));
 
 			vSceneWorldMat = SharpMatrix.RotationY(PI) * SharpMatrix.Scaling(0.3f) * SharpMatrix.Translation(0,0,2.5f);
@@ -139,7 +153,7 @@ namespace ProjectionMappingApp {
 			vMVP = vSceneWorldMat * head.getView() * head.projMat;
 			virtualScene.DrawContent(vMVP);
 			headRendering.endRendering();
-			
+	
 			graphics.setDepthEnabled(false);
 			surface.setOrthographicProjection();
 			projMat = surface.getProjectionMatrix();
@@ -153,10 +167,33 @@ namespace ProjectionMappingApp {
 			graphics.putRectPosUVColor(-surface.ratioX,-1+s,s*headRendering.getRatioX(),s, new Vector4(1,1,1,0.5f));
 			graphics.flush();
 
+			//--Projector-rendering--
 			context.ClearRenderTargetView(projectorForm.renderTargetView,Color4.Black);
 			context.ClearDepthStencilView(projectorForm.depthStencilView,DepthStencilClearFlags.Depth,1,0);
+			context.OutputMerger.SetRenderTargets(projectorForm.depthStencilView,projectorForm.renderTargetView);
+			context.Rasterizer.SetViewport(projectorForm.viewport);
+
+			var m = SharpMatrix.Identity;
+			var vp = projectorForm.view * projectorForm.projection;
+			var userVP = head.getView() * head.getProjection();
+
+			context.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
+
+			projMapShader.activate();
+			projMapShader.passTransformations(m,vp,userVP);
+			projMapShader.passColor(0.8f,0.8f,1,1);
+
+//			setMVP(m*vp);
+//			singleColorShader.activate();
+//			singleColorShader.passColor(new FloatColor(1,0,1,1));
+//			context.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
+//			singleColorShader.updateVSConstantBuffer(mvpTransp);
+			graphics.putPositionsMesh(rMesh.mesh);
+			graphics.flush();
 
 			projectorForm.swapChain.Present(0,PresentFlags.None);
+
+			surface.restoreRenderTargets();
 		}
 
 		public override void RawEvent(InputEvent ev) {

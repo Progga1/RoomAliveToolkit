@@ -12,6 +12,7 @@ using D3D11 = SharpDX.Direct3D11;
 using D3DDevice = SharpDX.Direct3D11.Device;
 using D3DDeviceContext = SharpDX.Direct3D11.DeviceContext;
 using SharpGraphics.Shaders;
+using RoomAliveToolkit;
 
 namespace SharpGraphics {
 
@@ -105,7 +106,7 @@ namespace SharpGraphics {
 			var indexBufferDesc = new BufferDescription() {
 				Usage = ResourceUsage.Dynamic,
 				BindFlags = BindFlags.IndexBuffer,
-				SizeInBytes = indices.Length,
+				SizeInBytes = indices.Length*4,
 				CpuAccessFlags = CpuAccessFlags.Write,
 				StructureByteStride = 0,
 				OptionFlags = 0,
@@ -115,7 +116,7 @@ namespace SharpGraphics {
 			var positionBufferDesc = new BufferDescription() {
 				Usage = ResourceUsage.Dynamic,
 				BindFlags = BindFlags.VertexBuffer,
-				SizeInBytes = positions.Length,
+				SizeInBytes = positions.Length*Utilities.SizeOf<Vector3>(),
 				CpuAccessFlags = CpuAccessFlags.Write,
 				StructureByteStride = 0,
 				OptionFlags = 0,
@@ -170,6 +171,13 @@ namespace SharpGraphics {
 
 		public void putPos(float x,float y,float z) {
 			positions[positionPos++] = new Vector3(x,y,z);
+		}
+
+		public void putPositionsMesh(Mesh mesh) {
+			foreach(Mesh.VertexPositionNormalTexture elem in mesh.vertices) {
+				indices[indexPos++] = positionPos;
+				positions[positionPos++] = new Vector3(elem.position.X,elem.position.Y,elem.position.Z);
+			}
 		}
 
 		public void putPos(Vector3 pos) {

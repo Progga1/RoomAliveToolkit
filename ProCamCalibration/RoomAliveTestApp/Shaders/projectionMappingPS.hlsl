@@ -7,10 +7,9 @@ cbuffer constants : register(b0) {
 
 struct pixel_in {
 	float4 pos : SV_POSITION;
-	float2 uv : TEXCOORD;
 	float4 color : COLOR;
 };
 
 float4 main(pixel_in i) : SV_TARGET{
-	return color*i.color*tex.Sample(texSampler,i.uv);
+	return color*i.color;
 }

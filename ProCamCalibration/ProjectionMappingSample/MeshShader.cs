@@ -296,11 +296,10 @@ namespace RoomAliveToolkit
 			if(depthStencilView!=null && renderTargetView!=null)
 				deviceContext.OutputMerger.SetTargets(depthStencilView, renderTargetView);
             deviceContext.OutputMerger.DepthStencilState = depthStencilState;
-
-            foreach (var subset in meshDeviceResources.mesh.subsets)
+			foreach (var subset in meshDeviceResources.mesh.subsets)
             //var subset = meshDeviceResources.mesh.subsets[meshDeviceResources.mesh.subsets.Count - 2];
             {
-                if (subset.material.textureFilename != null)
+				if (subset.material.textureFilename != null)
                 {
                     deviceContext.PixelShader.Set(meshWithTexturePS);
                     deviceContext.PixelShader.SetShaderResource(0, meshDeviceResources.textureRVs[subset]);
@@ -309,13 +308,12 @@ namespace RoomAliveToolkit
                     deviceContext.PixelShader.Set(meshPS);
 
                 SetPixelShaderConstants(deviceContext, subset.material, pointLight);
-                deviceContext.Draw(subset.length, subset.start);
+                deviceContext.Draw(subset.length-1, subset.start);
             }
 
         }
 
-
-        VertexShader meshVS;
+		VertexShader meshVS;
         PixelShader meshPS, meshWithTexturePS;
         ShaderBytecode shaderByteCode;
         DepthStencilState depthStencilState;
