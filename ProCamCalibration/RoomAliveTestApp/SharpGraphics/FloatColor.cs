@@ -13,6 +13,7 @@ namespace SharpGraphics {
 			this.r = r;
 			this.g = g;
 			this.b = b;
+			this.a = 1;
 		}
 
 		public FloatColor(float r,float g,float b,float a) : this() {

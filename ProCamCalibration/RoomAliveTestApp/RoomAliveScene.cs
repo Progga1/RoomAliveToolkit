@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using SharpDX.Direct3D11;
 using D3D11 = SharpDX.Direct3D11;
 using D3DDevice = SharpDX.Direct3D11.Device;
 using D3DDeviceContext = SharpDX.Direct3D11.DeviceContext;
@@ -17,19 +18,17 @@ namespace RoomAliveTestApp {
 
 	class RoomAliveScene {
 
+		public const float PI = 3.1415926535f;
+
 		public class Head {
-			public SharpMatrix projection;
+			public SharpMatrix projMat;
 			public Vector3 position;
+			public float yaw = PI, pitch = 0;
 
 			public Head() {
 				position = new Vector3(-0.6f,-0.5f,-0.2f);
 
-				projection = SharpMatrix.PerspectiveFovLH(1.2f,1.2f,0.05f,10);
-				//projection = GraphicsTransforms.PerspectiveFov(1.2f,1.2f,0.05f,10);
-				//projection.Transpose();
-				//projection[0,0] = -projection[0,0]; 
-				//Console.WriteLine(projection);
-				//Console.WriteLine(SharpMatrix.PerspectiveFovLH(1.2f,1.2f,0.05f,10));
+				projMat = SharpMatrix.PerspectiveFovRH(1.2f,1.2f,0.05f,10);
 			}
 
 			public SharpMatrix getView() {
@@ -38,18 +37,24 @@ namespace RoomAliveTestApp {
 				return result;
 			}
 
+			public SharpMatrix getViewTransp() {
+				SharpMatrix result = getView();
+				result.Transpose();
+				return result;
+			}
+
 			public SharpMatrix getProjection() {
-				return projection;
+				return projMat;
 			}
 
 			public SharpMatrix getProjectionTransp() {
-				SharpMatrix result = projection;
+				SharpMatrix result = projMat;
 				result.Transpose();
 				return result;
 			}
 
 			public SharpMatrix getWorldTransform() {
-				SharpMatrix worldTransform = SharpMatrix.Translation(position);
+				SharpMatrix worldTransform = SharpMatrix.RotationX(pitch) * SharpMatrix.RotationY(yaw) * SharpMatrix.Translation(position);
 				return worldTransform;
 			}
 
@@ -63,15 +68,17 @@ namespace RoomAliveTestApp {
 
 		public class HeadViewRendering {
 
-			public static int userTextureWidth = 2048;
-			public static int userTextureHeight = 1600;
+			public static int textureWidth = 2048;
+			public static int textureHeight = 1600;
 
 			public D3DDevice device;
 			public D3DDeviceContext context;
 			public RenderSurface surface;
+			public SharpTexture texture;
+			public Viewport viewport;
 
-			D3D11.RenderTargetView userViewRenderTargetView;
-			D3D11.DepthStencilView userViewDepthStencilView;
+			D3D11.RenderTargetView renderTargetView;
+			D3D11.DepthStencilView depthStencilView;
 
 			public RoomAliveScene scene;
 
@@ -81,26 +88,36 @@ namespace RoomAliveTestApp {
 				this.device = surface.device;
 				this.context = device.ImmediateContext;
 
-				var userViewTextureDesc = new D3D11.Texture2DDescription() {
-					Width = userTextureWidth,
-					Height = userTextureHeight,
+				var userViewTextureDesc = new Texture2DDescription() {
+					Width = textureWidth,
+					Height = textureHeight,
 					MipLevels = 1,
 					ArraySize = 1,
 					Format = SharpDX.DXGI.Format.B8G8R8A8_UNorm,
 					SampleDescription = new SharpDX.DXGI.SampleDescription(1,0),
-					Usage = D3D11.ResourceUsage.Default,
-					BindFlags = D3D11.BindFlags.RenderTarget | D3D11.BindFlags.ShaderResource,
-					CpuAccessFlags = D3D11.CpuAccessFlags.None,
+					Usage = ResourceUsage.Default,
+					BindFlags = BindFlags.RenderTarget | BindFlags.ShaderResource,
+					CpuAccessFlags = CpuAccessFlags.None,
 				};
-				var userViewRenderTarget = new D3D11.Texture2D(device,userViewTextureDesc);
-				userViewRenderTargetView = new D3D11.RenderTargetView(device,userViewRenderTarget);
+				var userViewRenderTarget = new Texture2D(device,userViewTextureDesc);
+				renderTargetView = new RenderTargetView(device,userViewRenderTarget);
 
-				userViewDepthStencilView = GFX.createZBuffer(device,userTextureWidth,userTextureHeight);
+				texture = new SharpTexture(device,userViewRenderTarget);
+
+				depthStencilView = GFX.createZBuffer(device,textureWidth,textureHeight);
+
+				viewport = new Viewport(0,0,textureWidth,textureHeight);
+			}
+
+			public float getRatioX() {
+				return textureWidth/(float)textureHeight;
 			}
 
 			public void beginRendering() {
-				context.ClearRenderTargetView(userViewRenderTargetView,Color4.Black);
-				context.OutputMerger.SetRenderTargets(userViewDepthStencilView);
+				context.ClearRenderTargetView(renderTargetView,new Color4(0,0,0,0));
+				context.ClearDepthStencilView(depthStencilView,DepthStencilClearFlags.Depth,1,0);
+				context.OutputMerger.SetRenderTargets(depthStencilView,renderTargetView);
+				context.Rasterizer.SetViewport(viewport);
 			}
 
 			public void endRendering() {

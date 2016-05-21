@@ -24,6 +24,8 @@ namespace ProjectionMappingApp {
 		RoomAliveScene.HeadViewRendering headRendering;
 		ProjectorCameraEnsemble ensemble;
 
+		SharpTexture cubeTex;
+
 		protected SharpMatrix vSceneWorldMat;
 
 		CameraControl cameraControl = new CameraControl();
@@ -47,6 +49,8 @@ namespace ProjectionMappingApp {
 			virtualScene = new QuadScene();
 			virtualScene.Init(surface);
 			headRendering = new RoomAliveScene.HeadViewRendering(roomScene,surface);
+
+			cubeTex = new SharpTexture(device,"Assets/cube.png");
 		}
 
 		private void drawViewFrustum(SharpMatrix worldTransform,SharpMatrix projection,FloatColor color) {
@@ -89,6 +93,8 @@ namespace ProjectionMappingApp {
 
 		public override void OnDraw() {
 			base.OnDraw();
+			graphics.setDepthEnabled(true);
+
 			surface.setOrthographicProjection(cameraControl.distance,-1,100);
 			surface.setPerspectiveProjection(1.2f,0.01f,30);
 
@@ -97,7 +103,7 @@ namespace ProjectionMappingApp {
 			setMVP(viewMat*projMat);
 
 			rMesh.meshShader.SetVertexShaderConstants(context,SharpMatrix.Identity,mvp,pointLight.position);
-			rMesh.meshShader.Render(context,rMesh.meshDeviceResources,pointLight,null,null,surface.viewport);
+			//rMesh.meshShader.Render(context,rMesh.meshDeviceResources,pointLight,null,null,surface.viewport);
 
 			viewMat = cameraControl.getViewMatrix();
 			projMat = surface.getProjectionMatrix();
@@ -109,7 +115,7 @@ namespace ProjectionMappingApp {
 				drawViewFrustum(camera.pose,camera.calibration.depthCameraMatrix,new FloatColor(0.2f,0.2f,0.6f),512,424,0.5f,4.5f);
 			}
 
-			drawViewFrustum(head.getWorldTransformTransp(),head.getProjectionTransp(),new FloatColor(0.7f,0.1f,0.05f));
+			drawViewFrustum(head.getViewTransp(),head.getProjectionTransp(),new FloatColor(0.7f,0.1f,0.05f));
 
 			vSceneWorldMat = SharpMatrix.RotationY(PI) * SharpMatrix.Scaling(0.3f) * SharpMatrix.Translation(0,0,2.5f);
 
@@ -118,8 +124,27 @@ namespace ProjectionMappingApp {
 			virtualScene.DrawContent(vMVP);
 
 			headRendering.beginRendering();
+			Console.WriteLine("D");
+			Console.WriteLine(head.getWorldTransform());
+			Console.WriteLine(head.getView());
+			vMVP = vSceneWorldMat * head.getView() * head.projMat;
 			virtualScene.DrawContent(vMVP);
 			headRendering.endRendering();
+
+			
+			graphics.setDepthEnabled(false);
+			surface.setOrthographicProjection();
+			projMat = surface.getProjectionMatrix();
+			projMat.Transpose();
+			posUVColorShader.activate();
+			posUVColorShader.updateVSConstantBuffer(projMat);
+			posUVColorShader.passColor(1,1,1,1);
+			context.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
+			graphics.bindTexture(headRendering.texture);
+			float s = 0.75f;
+			graphics.putRectPosUVColor(-surface.ratioX,-1+s,s*headRendering.getRatioX(),s, new Vector4(1,1,1,0.5f));
+			graphics.flush();
+
 		}
 
 		public override void RawEvent(InputEvent ev) {
@@ -128,7 +153,6 @@ namespace ProjectionMappingApp {
 		}
 
 		public override void Dispose() {
-			singleColorShader.Dispose();
 			virtualScene.Dispose();
 		}
 
@@ -140,9 +164,9 @@ namespace ProjectionMappingApp {
 			if(ev.code==Keys.A)
 				head.position.X -= HEAD_STEP;
 			if(ev.code==Keys.W)
-				head.position.Y -= HEAD_STEP;
-			if(ev.code==Keys.S)
 				head.position.Y += HEAD_STEP;
+			if(ev.code==Keys.S)
+				head.position.Y -= HEAD_STEP;
 		}
 
 	}

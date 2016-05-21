@@ -156,6 +156,7 @@ namespace SharpGraphics {
 			var blendDescription = new BlendStateDescription();
 			blendDescription.RenderTarget[0] = blendDesc;
 			defaultBlendState = new BlendState(device,blendDescription);
+			context.OutputMerger.SetBlendState(defaultBlendState);
 
 			//--Init-shaders--
 			singleColorShader = new SingleColorShader(device);
@@ -217,6 +218,19 @@ namespace SharpGraphics {
 			indices[indexPos++] = index1;
 			indices[indexPos++] = index2;
 			indices[indexPos++] = index3;
+		}
+
+		public void putRectPosUVColor(float left,float top, float width,float height, Vector4 color) {
+			putIndicesQuad();
+			float uvLeft = 0;
+			float uvTop = 0;
+			float uvRight = 1;
+			float uvBottom = 1;
+			float z = 0;
+			putPosUVColor(new Vector3(left,top,z),new Vector2(uvLeft,uvTop),color);
+			putPosUVColor(new Vector3(left+width,top,z),new Vector2(uvRight,uvTop),color);
+			putPosUVColor(new Vector3(left,top-height,z),new Vector2(uvLeft,uvBottom),color);
+			putPosUVColor(new Vector3(left+width,top-height,z),new Vector2(uvRight,uvBottom),color);
 		}
 
 		public void putIndicesQuad() {
