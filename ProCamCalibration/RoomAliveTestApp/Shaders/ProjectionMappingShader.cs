@@ -26,7 +26,7 @@ namespace SharpGraphics.Shaders {
 
 		public ProjectionMappingShader(D3D11.Device device) : base(device,2*16*4,4*4) {
 			base.fromFiles("projectionMappingVS.hlsl","projectionMappingPS.hlsl");
-			base.setInputElements(new[] { GFX.positionInputElement,new D3D11.InputElement("COLOR",0,Format.R32G32B32A32_Float,0,1) });
+			base.setInputElements(new[] { GFX.PositionInputElement,new D3D11.InputElement("COLOR",0,Format.R32G32B32A32_Float,0,2) });
 		}
 
 		public void passTransformations(SharpMatrix m,SharpMatrix projVP,SharpMatrix userV,SharpMatrix userP) {

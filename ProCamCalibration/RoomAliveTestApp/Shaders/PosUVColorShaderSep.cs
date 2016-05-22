@@ -10,13 +10,13 @@ using GFX = SharpGraphics.GFX;
 
 namespace SharpGraphics.Shaders {
 
-	public class PosUVColorShader : ShaderBase {
+	public class PosUVColorShaderSep : ShaderBase {
 
 		protected FloatColor color = new FloatColor();
 
-		public PosUVColorShader(D3D11.Device device) : base(device,16*4,4*4) {
+		public PosUVColorShaderSep(D3D11.Device device) : base(device,16*4,4*4) {
 			base.fromFiles("posUVColorVS.hlsl","posUVColorPS.hlsl");
-			base.setInputElements(GFX.PosUVColorElements);
+			base.setInputElements(GFX.PosUVColorElementsSep);
 		}
 
 		public void passColor(float r,float g,float b,float a) {

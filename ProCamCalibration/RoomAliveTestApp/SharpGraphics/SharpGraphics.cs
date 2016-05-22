@@ -33,24 +33,35 @@ namespace SharpGraphics {
 			}
 		}
 
-		public static InputElement positionInputElement = new D3D11.InputElement("POSITION",0,Format.R32G32B32_Float,0,0);
+		public static InputElement PositionInputElement = new InputElement("POSITION",0,Format.R32G32B32_Float,0,0);
+		public static InputElement UVInputElement = new InputElement("TEXCOORD",0,Format.R32G32_Float,0,1);
+		public static InputElement ColorInputElement = new InputElement("COLOR",0,Format.R32G32B32A32_Float,0,2);
 
-		public static InputElement[] positionInputElements = new[] {
-			positionInputElement
+		public static InputElement[] PositionInputElements = new[] {
+			PositionInputElement
 		};
 
-		public static InputElement[] posUVColorElements = new[] {
-			positionInputElement,
+		public static InputElement[] PosUVColorElements = new[] {
+			PositionInputElement,
 			new InputElement("TEXCOORD",0,Format.R32G32_Float,12,0),
 			new InputElement("COLOR",0,Format.R32G32B32A32_Float,20,0)
 		};
 
+		public static InputElement[] PosUVColorElementsSep = new[] {
+			PositionInputElement,
+			UVInputElement,
+			ColorInputElement
+		};
+
 		public SingleColorShader singleColorShader { get; private set; }
 		public PosUVColorShader posUVColorShader { get; private set; }
+		public PosUVColorShaderSep posUVColorShaderSep { get; private set; }
+		public PosColorShader posColorShader { get; private set; }
 
 		public static ImagingFactory2 imagingFactory = new ImagingFactory2();
 
 		private Vector3[] positions = new Vector3[MAX_VERTICES];
+		private Vector2[] UVs = new Vector2[MAX_VERTICES];
 		private FloatColor[] colors = new FloatColor[MAX_VERTICES];
 		private PosUVColor[] posUVColorVals = new PosUVColor[MAX_VERTICES];
 		private int[] indices = new int[MAX_VERTICES*2];
@@ -59,6 +70,8 @@ namespace SharpGraphics {
 		private VertexBufferBinding positionBinding;
 		private D3D11.Buffer colorBuffer;
 		private VertexBufferBinding colorBinding;
+		private D3D11.Buffer uvBuffer;
+		private VertexBufferBinding uvBinding;
 		private D3D11.Buffer posUVColorBuffer;
 		private VertexBufferBinding posUVColorBinding;
 		private D3D11.Buffer indexBuffer;
@@ -68,6 +81,7 @@ namespace SharpGraphics {
 
 		private int positionPos = 0;
 		private int colorPos = 0;
+		private int uvPos = 0;
 		private int indexPos = 0;
 		private int posUVColorPos = 0;
 
@@ -79,7 +93,7 @@ namespace SharpGraphics {
 
 		public static D3D11.DepthStencilView createZBuffer(D3DDevice device,int width,int height) {
 			var zBufferTextureDescription = new D3D11.Texture2DDescription {
-				Format = Format.D16_UNorm,
+				Format = Format.D32_Float,
 				ArraySize = 1,
 				MipLevels = 1,
 				Width = width,
@@ -131,16 +145,27 @@ namespace SharpGraphics {
 			positionBuffer = new D3D11.Buffer(device,positionBufferDesc);
 			positionBinding = new VertexBufferBinding(positionBuffer,Utilities.SizeOf<Vector3>(),0);
 
+			var uvBufferDesc = new BufferDescription() {
+				Usage = ResourceUsage.Dynamic,
+				BindFlags = BindFlags.VertexBuffer,
+				SizeInBytes = UVs.Length*Utilities.SizeOf<Vector2>(),
+				CpuAccessFlags = CpuAccessFlags.Write,
+				StructureByteStride = 0,
+				OptionFlags = 0,
+			};
+			uvBuffer = new D3D11.Buffer(device,uvBufferDesc);
+			uvBinding = new VertexBufferBinding(uvBuffer,Utilities.SizeOf<Vector2>(),0);
+
 			var colorBufferDesc = new BufferDescription() {
 				Usage = ResourceUsage.Dynamic,
 				BindFlags = BindFlags.VertexBuffer,
-				SizeInBytes = positions.Length*Utilities.SizeOf<Vector3>(),
+				SizeInBytes = colors.Length*Utilities.SizeOf<FloatColor>(),
 				CpuAccessFlags = CpuAccessFlags.Write,
 				StructureByteStride = 0,
 				OptionFlags = 0,
 			};
 			colorBuffer = new D3D11.Buffer(device,colorBufferDesc);
-			colorBinding = new VertexBufferBinding(colorBuffer,Utilities.SizeOf<Vector4>(),0);
+			colorBinding = new VertexBufferBinding(colorBuffer,Utilities.SizeOf<FloatColor>(),0);
 
 			var vertexBufferDesc = new BufferDescription() {
 				Usage = ResourceUsage.Dynamic,
@@ -181,6 +206,8 @@ namespace SharpGraphics {
 			//--Init-shaders--
 			singleColorShader = new SingleColorShader(device);
 			posUVColorShader = new PosUVColorShader(device);
+			posUVColorShaderSep = new PosUVColorShaderSep(device);
+			posColorShader = new PosColorShader(device);
 		}
 
 		public void setDepthEnabled(bool enabled) {
@@ -195,6 +222,21 @@ namespace SharpGraphics {
 			foreach(Mesh.VertexPositionNormalTexture elem in mesh.vertices) {
 				indices[indexPos++] = positionPos;
 				positions[positionPos++] = new Vector3(elem.position.X,elem.position.Y,elem.position.Z);
+			}
+		}
+
+		public void putColorsByMeshNormals(Mesh mesh,FloatColor color,float minDot,Vector3 brightDir) {
+			foreach(Mesh.VertexPositionNormalTexture elem in mesh.vertices) {
+				float dot = Vector3.Dot(brightDir,elem.normal);
+				if(dot<minDot)
+					dot = minDot;
+				colors[colorPos++] = dot * color;
+			}
+		}
+
+		public void putUVsMesh(Mesh mesh) {
+			foreach(Mesh.VertexPositionNormalTexture elem in mesh.vertices) {
+				UVs[uvPos++] = elem.texture;
 			}
 		}
 
@@ -251,6 +293,14 @@ namespace SharpGraphics {
 			indices[indexPos++] = baseIndex+6;
 			indices[indexPos++] = baseIndex+3;
 			indices[indexPos++] = baseIndex+7;
+		}
+
+		public void putUVs(Vector2 uv) {
+			UVs[uvPos++] = uv;
+		}
+
+		public void putUVs(float u,float v) {
+			UVs[uvPos++] = new Vector2(u,v);
 		}
 
 		public void putIndex(int index) {
@@ -318,13 +368,21 @@ namespace SharpGraphics {
 				context.InputAssembler.SetVertexBuffers(0,positionBinding);
 				positionPos = 0;
 
+				if(uvPos>0) {
+					updateBuffer(uvBuffer,UVs,uvPos);
+					context.InputAssembler.SetVertexBuffers(1,uvBinding);
+					uvPos = 0;
+				}
+
 				if(colorPos>0) {
 					updateBuffer(colorBuffer,colors,colorPos);
-					context.InputAssembler.SetVertexBuffers(1,colorBinding);
+					context.InputAssembler.SetVertexBuffers(2,colorBinding);
 					colorPos = 0;
 				}
 
 				context.DrawIndexed(indexPos,0,0);
+
+				
 			}
 
 			if(posUVColorPos>0) {

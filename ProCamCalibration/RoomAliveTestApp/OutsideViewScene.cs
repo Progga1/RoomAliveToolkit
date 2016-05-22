@@ -123,13 +123,15 @@ namespace ProjectionMappingApp {
 			//rMesh.meshShader.SetVertexShaderConstants(context,SharpMatrix.Identity,mvp,pointLight.position);
 			//rMesh.meshShader.Render(context,rMesh.meshDeviceResources,pointLight,null,null,surface.viewport);
 
-			if(false) {
-				singleColorShader.activate();
-				singleColorShader.passColor(new FloatColor(1,0.5f,0,1));
-				singleColorShader.updateVSConstantBuffer(mvpTransp);
-				graphics.putPositionsMesh(rMesh.mesh);
-				graphics.flush();
-			}
+
+			graphics.posColorShader.activate();
+			graphics.posColorShader.passColor(new FloatColor(1,1,1,1));
+			graphics.posColorShader.updateVSConstantBuffer(mvpTransp);
+			graphics.putPositionsMesh(rMesh.mesh);
+			//graphics.putColor(new FloatColor(0.5f,1,1,1),rMesh.mesh.vertices.Count);
+			graphics.putColorsByMeshNormals(rMesh.mesh,new FloatColor(1,1,1,1),0.3f,new Vector3(1,1,-1));
+			graphics.flush();
+
 
 			//--Draw-frustums--
 			viewMat = cameraControl.getViewMatrix();
@@ -143,7 +145,7 @@ namespace ProjectionMappingApp {
 			}
 			drawViewFrustum(head.getViewTransp(),head.getProjectionTransp(),new FloatColor(0.7f,0.1f,0.05f));
 
-			vSceneWorldMat = SharpMatrix.RotationY(PI) * SharpMatrix.Scaling(0.6f,1.2f,0.6f) * SharpMatrix.Translation(0,0,2.5f);
+			vSceneWorldMat = SharpMatrix.RotationY(PI) * SharpMatrix.Scaling(0.6f,0.6f,0.6f) * SharpMatrix.Translation(0,0,2.5f);
 
 			SharpMatrix vMVP = vSceneWorldMat * mvp;
 

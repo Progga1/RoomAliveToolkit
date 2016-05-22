@@ -29,6 +29,14 @@ namespace SharpGraphics {
 			this.b = b;
 			this.a = a;
 		}
+
+		public static FloatColor operator *(float factor,FloatColor color) {
+			return new FloatColor(factor*color.r,factor*color.g,factor*color.b,color.a);
+		}
+
+		public static FloatColor operator *(FloatColor color,float factor) {
+			return new FloatColor(factor*color.r,factor*color.g,factor*color.b,color.a);
+		}
 	}
 
 }

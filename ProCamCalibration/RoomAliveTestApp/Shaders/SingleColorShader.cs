@@ -17,7 +17,7 @@ namespace SharpGraphics.Shaders {
 
 		public SingleColorShader(D3D11.Device device) : base(device,16*SIZE_F,4*SIZE_F) {
 			base.fromFiles("singleColorVS.hlsl","singleColorPS.hlsl");
-			base.setInputElements(GFX.positionInputElements);
+			base.setInputElements(GFX.PositionInputElements);
 		}
 
 		public void passColor(float r,float g,float b,float a) {
