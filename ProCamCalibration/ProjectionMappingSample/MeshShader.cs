@@ -308,7 +308,7 @@ namespace RoomAliveToolkit
                     deviceContext.PixelShader.Set(meshPS);
 
                 SetPixelShaderConstants(deviceContext, subset.material, pointLight);
-                deviceContext.Draw(subset.length-1, subset.start);
+                deviceContext.Draw(subset.length, subset.start);
             }
 
         }
@@ -318,7 +318,7 @@ namespace RoomAliveToolkit
         ShaderBytecode shaderByteCode;
         DepthStencilState depthStencilState;
         RasterizerState rasterizerState;
-        SamplerState colorSamplerState;
+        public SamplerState colorSamplerState;
         SharpDX.Direct3D11.Buffer vertexShaderConstantBuffer, pixelShaderConstantBuffer;
         InputLayout vertexInputLayout;
     }

@@ -11,7 +11,7 @@ using D3DDeviceContext = SharpDX.Direct3D11.DeviceContext;
 
 namespace RoomAliveTestApp {
 
-	class RoomMesh {
+	public class RoomMesh {
 
 		public bool flipTexY = false;
 

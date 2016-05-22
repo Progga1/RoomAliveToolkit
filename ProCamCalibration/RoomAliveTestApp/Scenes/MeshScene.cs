@@ -1,5 +1,6 @@
 using RoomAliveToolkit;
 using SharpDX;
+using SharpDX.Direct3D;
 using SharpDX.WIC;
 using SharpGraphics;
 using System;
@@ -21,15 +22,22 @@ namespace RoomAliveTestApp.Scenes {
 			graphics.setDepthEnabled(true);
 		}
 
-		public override void OnDraw() {
+		public override void DrawContent(SharpDX.Matrix mvpMat) {
+			base.DrawContent(mvpMat);
+			if(false) {
+				rMesh.meshShader.SetVertexShaderConstants(context,SharpDX.Matrix.Identity,mvp,pointLight.position);
+				rMesh.meshShader.Render(context,rMesh.meshDeviceResources,pointLight,null,null,surface.viewport);
+			} else {
+				graphics.drawMesh(rMesh,mvp,new FloatColor(0.9f),new Vector3(0,1,0));
+			}
+		}
 
+		public override void OnDraw() {
 			surface.setOrthographicProjection(cameraControl.distance,-1,100);
 			surface.setPerspectiveProjection(1.2f,0.01f,10);
 
-			SharpDX.Matrix projMat = surface.getProjectionMatrix();
-			SharpDX.Matrix viewMat = cameraControl.getViewMatrix();
-			rMesh.meshShader.SetVertexShaderConstants(context,SharpDX.Matrix.Identity,viewMat*projMat,pointLight.position);
-			rMesh.meshShader.Render(context,rMesh.meshDeviceResources,pointLight,null,null,surface.viewport);
+			base.setMVP(cameraControl.getViewMatrix()*surface.getProjectionMatrix());
+			DrawContent(mvp);
 		}
 
 		public override void RawEvent(InputEvent ev) {

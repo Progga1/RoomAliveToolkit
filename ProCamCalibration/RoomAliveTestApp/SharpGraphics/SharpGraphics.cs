@@ -14,6 +14,8 @@ using D3DDeviceContext = SharpDX.Direct3D11.DeviceContext;
 using SharpMatrix = SharpDX.Matrix;
 using SharpGraphics.Shaders;
 using RoomAliveToolkit;
+using SharpDX.Direct3D;
+using RoomAliveTestApp;
 
 namespace SharpGraphics {
 
@@ -225,8 +227,32 @@ namespace SharpGraphics {
 			}
 		}
 
+		public void putPositionsMesh(Mesh mesh,int start,int count) {
+			int i = -1;
+			foreach(Mesh.VertexPositionNormalTexture elem in mesh.vertices) {
+				i++;
+				if(i<start || i>=start+count)
+					continue;
+				indices[indexPos++] = positionPos;
+				positions[positionPos++] = new Vector3(elem.position.X,elem.position.Y,elem.position.Z);
+			}
+		}
+
 		public void putColorsByMeshNormals(Mesh mesh,FloatColor color,float minDot,Vector3 brightDir) {
 			foreach(Mesh.VertexPositionNormalTexture elem in mesh.vertices) {
+				float dot = Vector3.Dot(brightDir,elem.normal);
+				if(dot<minDot)
+					dot = minDot;
+				colors[colorPos++] = dot * color;
+			}
+		}
+
+		public void putColorsByMeshNormals(Mesh mesh,FloatColor color,float minDot,Vector3 brightDir,int start,int count) {
+			int i = -1;
+			foreach(Mesh.VertexPositionNormalTexture elem in mesh.vertices) {
+				i++;
+				if(i<start || i>=start+count)
+					continue;
 				float dot = Vector3.Dot(brightDir,elem.normal);
 				if(dot<minDot)
 					dot = minDot;
@@ -237,6 +263,39 @@ namespace SharpGraphics {
 		public void putUVsMesh(Mesh mesh) {
 			foreach(Mesh.VertexPositionNormalTexture elem in mesh.vertices) {
 				UVs[uvPos++] = elem.texture;
+			}
+		}
+
+		public void putUVsMesh(Mesh mesh,int start,int count) {
+			int i = -1;
+			foreach(Mesh.VertexPositionNormalTexture elem in mesh.vertices) {
+				i++;
+				if(i<start || i>=start+count)
+					continue;
+				UVs[uvPos++] = elem.texture;
+			}
+		}
+
+		public void drawMesh(RoomMesh rMesh,SharpMatrix mvp,FloatColor colorFactor,Vector3 lightNormal) {
+			mvp.Transpose();
+			context.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
+			foreach(var subset in rMesh.mesh.subsets) {
+				putPositionsMesh(rMesh.mesh,subset.start,subset.length);
+				putUVsMesh(rMesh.mesh,subset.start,subset.length);
+				//graphics.putColor(FloatColor.White,subset.length);
+				putColorsByMeshNormals(rMesh.mesh,new FloatColor(subset.material.diffuseColor),0.05f,lightNormal,subset.start,subset.length);
+				if(subset.material.textureFilename == null) {
+					posColorShader.activate();
+					posColorShader.passColor(colorFactor);
+					posColorShader.updateVSConstantBuffer(mvp);
+				} else {
+					context.PixelShader.SetSampler(0,rMesh.meshShader.colorSamplerState);
+					context.PixelShader.SetShaderResource(0,rMesh.meshDeviceResources.textureRVs[subset]);
+					posUVColorShaderSep.activate();
+					posUVColorShaderSep.passColor(colorFactor);
+					posUVColorShaderSep.updateVSConstantBuffer(mvp);
+				}
+				flush();
 			}
 		}
 

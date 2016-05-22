@@ -69,19 +69,17 @@ namespace RoomAliveTestApp {
 				quadSurface.run();
 			})).Start();
 
-			if(false) {
-				new Thread(new ThreadStart(() => {
-					meshSurface = new RenderSurface(RenderCallback);
-					meshSurface.clearColor = new Color(45,45,45);
-					meshSurface.initWindowed("Mesh",800,600);
+			new Thread(new ThreadStart(() => {
+				meshSurface = new RenderSurface(RenderCallback);
+				meshSurface.clearColor = new Color(45,45,45);
+				meshSurface.initWindowed("Mesh",800,600);
 
-					meshScene = new MeshScene();
-					meshScene.Init(meshSurface);
+				meshScene = new MeshScene();
+				meshScene.Init(meshSurface);
 
-					meshSurface.setInputCallback(this);
-					meshSurface.run();
-				})).Start();
-			}
+				meshSurface.setInputCallback(this);
+				meshSurface.run();
+			})).Start();
 
 			new Thread(new ThreadStart(() => {
 				textureSurface = new RenderSurface(RenderCallback);

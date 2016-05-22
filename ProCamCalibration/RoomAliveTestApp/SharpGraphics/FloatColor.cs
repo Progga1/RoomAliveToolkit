@@ -1,3 +1,4 @@
+using SharpDX;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,11 +24,32 @@ namespace SharpGraphics {
 			this.a = 1;
 		}
 
+		public FloatColor(float rgb) : this() {
+			this.r = rgb;
+			this.g = rgb;
+			this.b = rgb;
+			this.a = 1;
+		}
+
 		public FloatColor(float r,float g,float b,float a) : this() {
 			this.r = r;
 			this.g = g;
 			this.b = b;
 			this.a = a;
+		}
+
+		public FloatColor(Vector3 values) : this() {
+			this.r = values.X;
+			this.g = values.Y;
+			this.b = values.Z;
+			this.a = 1;
+		}
+
+		public FloatColor(Vector4 values) : this() {
+			this.r = values.X;
+			this.g = values.Y;
+			this.b = values.Z;
+			this.a = values.W;
 		}
 
 		public static FloatColor operator *(float factor,FloatColor color) {
