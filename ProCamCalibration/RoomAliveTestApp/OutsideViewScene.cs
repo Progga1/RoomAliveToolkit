@@ -75,9 +75,9 @@ namespace ProjectionMappingApp {
 			projMapShader = new ProjectionMappingShader(device);
 		}
 
-		private void drawViewFrustum(SharpMatrix worldTransform,SharpMatrix projection,FloatColor color) {
+		private void drawViewFrustum(SharpMatrix view,SharpMatrix projection,FloatColor color) {
 			
-			worldToNorm = projection* worldTransform;
+			worldToNorm = projection * view;
 			normToWorld = worldToNorm;
 			normToWorld.Invert();
 
@@ -102,15 +102,16 @@ namespace ProjectionMappingApp {
 		}
 
 		private void drawViewFrustum(RoomMatrix pose,RoomMatrix intrinsics,FloatColor color,int imgWidth,int imgHeight,float near,float far) {
-			SharpMatrix extrinsics = MatrixOps.getSharpMatrix(pose);
-			extrinsics.Invert();
+			SharpMatrix view = MatrixOps.getSharpMatrix(pose);  
+			view.Invert(); //Extrinsics
+
 			float fx = (float)intrinsics[0,0];
 			float fy = (float)intrinsics[1,1];
 			float cx = (float)intrinsics[0,2];
 			float cy = (float)intrinsics[1,2];
 			projection = GraphicsTransforms.ProjectionMatrixFromCameraMatrix(fx,fy,cx,cy,imgWidth,imgHeight,near,far);
 
-			drawViewFrustum(extrinsics,projection,color);
+			drawViewFrustum(view,projection,color);
 		}
 
 		public override void OnDraw() {
@@ -124,9 +125,6 @@ namespace ProjectionMappingApp {
 			SharpMatrix projMat = surface.getProjectionMatrix();
 			SharpMatrix viewMat = cameraControl.getViewMatrix();
 			setMVP(viewMat*projMat);
-
-			//rMesh.meshShader.SetVertexShaderConstants(context,SharpMatrix.Identity,mvp,pointLight.position);
-			//rMesh.meshShader.Render(context,rMesh.meshDeviceResources,pointLight,null,null,surface.viewport);
 
 			graphics.posColorShader.activate();
 			graphics.posColorShader.passColor(new FloatColor(1,1,1,1));

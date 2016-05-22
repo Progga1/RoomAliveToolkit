@@ -27,7 +27,6 @@ namespace RoomAliveTestApp {
 
 			public Head() {
 				position = new Vector3(-0.6f,-0.5f,1.5f);
-
 				projMat = SharpMatrix.PerspectiveFovLH(1.45f,1.35f,0.05f,10);
 			}
 
