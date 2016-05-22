@@ -24,6 +24,8 @@ namespace RoomAliveTestApp.Scenes {
 
 		public override void DrawContent(SharpDX.Matrix mvpMat) {
 			base.DrawContent(mvpMat);
+			base.setMVP(mvpMat);
+
 			if(false) {
 				rMesh.meshShader.SetVertexShaderConstants(context,SharpDX.Matrix.Identity,mvp,pointLight.position);
 				rMesh.meshShader.Render(context,rMesh.meshDeviceResources,pointLight,null,null,surface.viewport);
@@ -33,11 +35,9 @@ namespace RoomAliveTestApp.Scenes {
 		}
 
 		public override void OnDraw() {
-			surface.setOrthographicProjection(cameraControl.distance,-1,100);
 			surface.setPerspectiveProjection(1.2f,0.01f,10);
-
-			base.setMVP(cameraControl.getViewMatrix()*surface.getProjectionMatrix());
-			DrawContent(mvp);
+			
+			DrawContent(cameraControl.getViewMatrix()*surface.getProjectionMatrix());
 		}
 
 		public override void RawEvent(InputEvent ev) {

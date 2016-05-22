@@ -20,6 +20,8 @@ namespace ProjectionMappingApp {
 
 	class OutsideViewScene : VirtualSceneBase {
 
+		public static bool DrawUserView = false;
+
 		RoomAliveScene roomScene;
 		VirtualSceneBase virtualScene;
 
@@ -54,7 +56,10 @@ namespace ProjectionMappingApp {
 			cameraControl.position.Z = 2.4f;
 			cameraControl.alpha = PI;
 
-			virtualScene = new QuadScene();
+			//virtualScene = new QuadScene();
+			//vSceneWorldMat = SharpMatrix.RotationY(PI) * SharpMatrix.Scaling(0.6f,0.6f,0.6f) * SharpMatrix.Translation(0,0,2.5f);
+			virtualScene = new MeshScene();
+			vSceneWorldMat = SharpMatrix.RotationX(PI/2) * SharpMatrix.RotationY(PI) * SharpMatrix.Scaling(0.6f) * SharpMatrix.Translation(0,0,2.6f);
 			virtualScene.Init(surface);
 			headRendering = new RoomAliveScene.HeadViewRendering(roomScene,surface);
 
@@ -63,7 +68,7 @@ namespace ProjectionMappingApp {
 			//--Init-projector--
 			var factory = new Factory1();
 			projectorForm = new ProjectorForm(factory,device,new object(),ensemble.projectors[0]);
-			projectorForm.FullScreen = false; // TODO: fix this so can be called after Show
+			projectorForm.FullScreen = false;
 			projectorForm.ClientSize = new System.Drawing.Size(640,480);
 			projectorForm.Show();
 
@@ -123,7 +128,6 @@ namespace ProjectionMappingApp {
 			//rMesh.meshShader.SetVertexShaderConstants(context,SharpMatrix.Identity,mvp,pointLight.position);
 			//rMesh.meshShader.Render(context,rMesh.meshDeviceResources,pointLight,null,null,surface.viewport);
 
-
 			graphics.posColorShader.activate();
 			graphics.posColorShader.passColor(new FloatColor(1,1,1,1));
 			graphics.posColorShader.updateVSConstantBuffer(mvpTransp);
@@ -145,8 +149,6 @@ namespace ProjectionMappingApp {
 			}
 			drawViewFrustum(head.getViewTransp(),head.getProjectionTransp(),new FloatColor(0.7f,0.1f,0.05f));
 
-			vSceneWorldMat = SharpMatrix.RotationY(PI) * SharpMatrix.Scaling(0.6f,0.6f,0.6f) * SharpMatrix.Translation(0,0,2.5f);
-
 			SharpMatrix vMVP = vSceneWorldMat * mvp;
 
 			virtualScene.DrawContent(vMVP);
@@ -156,18 +158,20 @@ namespace ProjectionMappingApp {
 			virtualScene.DrawContent(vMVP);
 			headRendering.endRendering();
 	
-			graphics.setDepthEnabled(false);
-			surface.setOrthographicProjection();
-			projMat = surface.getProjectionMatrix();
-			projMat.Transpose();
-			posUVColorShader.activate();
-			posUVColorShader.updateVSConstantBuffer(projMat);
-			posUVColorShader.passColor(1,1,1,1);
-			context.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
-			graphics.bindTexture(headRendering.texture);
-			float s = 0.75f;
-			graphics.putRectPosUVColor(-surface.ratioX,-1+s,s*headRendering.getRatioX(),s, new Vector4(1,1,1,0.5f));
-			graphics.flush();
+			if(DrawUserView) {
+				graphics.setDepthEnabled(false);
+				surface.setOrthographicProjection();
+				projMat = surface.getProjectionMatrix();
+				projMat.Transpose();
+				posUVColorShader.activate();
+				posUVColorShader.updateVSConstantBuffer(projMat);
+				posUVColorShader.passColor(1,1,1,1);
+				context.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
+				graphics.bindTexture(headRendering.texture);
+				float s = 0.75f;
+				graphics.putRectPosUVColor(-surface.ratioX,-1+s,s*headRendering.getRatioX(),s, new Vector4(1,1,1,0.5f));
+				graphics.flush();
+			}
 
 			//--Projector-rendering--
 			context.ClearRenderTargetView(projectorForm.renderTargetView,Color4.Black);
@@ -179,7 +183,7 @@ namespace ProjectionMappingApp {
 
 			projMapShader.activate();
 			projMapShader.passTransformations(SharpMatrix.Identity,projectorForm.view * projectorForm.projection,head.getView(),head.getProjection());
-			projMapShader.passColor(0.8f,0.8f,1,1);
+			projMapShader.passColor(1,1,1,1);
 			graphics.bindTexture(headRendering.texture);
 
 //			setMVP(m*vp);
