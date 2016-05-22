@@ -6,6 +6,7 @@ cbuffer constants : register(b0) {
 struct vertex_in
 {
 	float4 pos : POSITION;
+	float4 color : COLOR;
 };
 
 struct vertex_out
@@ -20,6 +21,6 @@ vertex_out main(vertex_in i) {
 	o.pos = mul(i.pos, mvpProjector);
 	float4 userProj = mul(i.pos, mvpUser);
 	o.texCoords = userProj.xy / userProj.w;
-	o.color = float4(1.0,1.0,1.0,1.0);
+	o.color = i.color;
 	return o;
 }

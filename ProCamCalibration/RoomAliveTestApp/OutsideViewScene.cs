@@ -186,6 +186,7 @@ namespace ProjectionMappingApp {
 //			context.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
 //			singleColorShader.updateVSConstantBuffer(mvpTransp);
 			graphics.putPositionsMesh(rMesh.mesh);
+			graphics.putColor(FloatColor.White,rMesh.mesh.vertices.Count);
 			graphics.flush();
 
 			projectorForm.swapChain.Present(0,PresentFlags.None);

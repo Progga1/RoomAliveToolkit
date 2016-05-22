@@ -7,6 +7,13 @@ using System.Threading.Tasks;
 namespace SharpGraphics {
 
 	public struct FloatColor {
+
+		public static FloatColor White = new FloatColor(1,1,1,1);
+		public static FloatColor Red = new FloatColor(1,0,0,1);
+		public static FloatColor Green = new FloatColor(0,1,0,1);
+		public static FloatColor Blue = new FloatColor(0,0,1,1);
+		public static FloatColor Black = new FloatColor(0,0,0,1);
+
 		public float r,g,b,a;
 
 		public FloatColor(float r,float g,float b) : this() {

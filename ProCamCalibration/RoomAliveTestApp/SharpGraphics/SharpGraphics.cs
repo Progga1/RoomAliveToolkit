@@ -33,14 +33,16 @@ namespace SharpGraphics {
 			}
 		}
 
-		public static D3D11.InputElement[] positionInputElements = new[] {
-			new D3D11.InputElement("POSITION",0,Format.R32G32B32_Float,0,0)
+		public static InputElement positionInputElement = new D3D11.InputElement("POSITION",0,Format.R32G32B32_Float,0,0);
+
+		public static InputElement[] positionInputElements = new[] {
+			positionInputElement
 		};
 
-		public static D3D11.InputElement[] posUVColorElements = new[] {
-			new D3D11.InputElement("POSITION",0,Format.R32G32B32_Float,0,0),
-			new D3D11.InputElement("TEXCOORD",0,Format.R32G32_Float,12,0),
-			new D3D11.InputElement("COLOR",0,Format.R32G32B32A32_Float,20,0)
+		public static InputElement[] posUVColorElements = new[] {
+			positionInputElement,
+			new InputElement("TEXCOORD",0,Format.R32G32_Float,12,0),
+			new InputElement("COLOR",0,Format.R32G32B32A32_Float,20,0)
 		};
 
 		public SingleColorShader singleColorShader { get; private set; }
@@ -49,19 +51,23 @@ namespace SharpGraphics {
 		public static ImagingFactory2 imagingFactory = new ImagingFactory2();
 
 		private Vector3[] positions = new Vector3[MAX_VERTICES];
+		private FloatColor[] colors = new FloatColor[MAX_VERTICES];
 		private PosUVColor[] posUVColorVals = new PosUVColor[MAX_VERTICES];
 		private int[] indices = new int[MAX_VERTICES*2];
 
 		private D3D11.Buffer positionBuffer;
-		private D3D11.VertexBufferBinding positionBinding;
+		private VertexBufferBinding positionBinding;
+		private D3D11.Buffer colorBuffer;
+		private VertexBufferBinding colorBinding;
 		private D3D11.Buffer posUVColorBuffer;
-		private D3D11.VertexBufferBinding posUVColorBinding;
+		private VertexBufferBinding posUVColorBinding;
 		private D3D11.Buffer indexBuffer;
 
 		D3DDevice device;
 		D3DDeviceContext context;
 
 		private int positionPos = 0;
+		private int colorPos = 0;
 		private int indexPos = 0;
 		private int posUVColorPos = 0;
 
@@ -124,6 +130,17 @@ namespace SharpGraphics {
 			};
 			positionBuffer = new D3D11.Buffer(device,positionBufferDesc);
 			positionBinding = new VertexBufferBinding(positionBuffer,Utilities.SizeOf<Vector3>(),0);
+
+			var colorBufferDesc = new BufferDescription() {
+				Usage = ResourceUsage.Dynamic,
+				BindFlags = BindFlags.VertexBuffer,
+				SizeInBytes = positions.Length*Utilities.SizeOf<Vector3>(),
+				CpuAccessFlags = CpuAccessFlags.Write,
+				StructureByteStride = 0,
+				OptionFlags = 0,
+			};
+			colorBuffer = new D3D11.Buffer(device,colorBufferDesc);
+			colorBinding = new VertexBufferBinding(colorBuffer,Utilities.SizeOf<Vector4>(),0);
 
 			var vertexBufferDesc = new BufferDescription() {
 				Usage = ResourceUsage.Dynamic,
@@ -195,6 +212,15 @@ namespace SharpGraphics {
 		public void putPos(Vector3[] pos) {
 			foreach(Vector3 p in pos)
 				positions[positionPos++] = p;
+		}
+
+		public void putColor(FloatColor color) {
+			colors[colorPos++] = color;
+		}
+
+		public void putColor(FloatColor color,int amount) {
+			for(int i = 0; i<amount; i++)
+				colors[colorPos++] = color;
 		}
 
 		public void putCubeLineIndices() {
@@ -269,10 +295,16 @@ namespace SharpGraphics {
 			context.PixelShader.SetShaderResource(0,texture.resource);
 		}
 
+		private SharpDX.DataStream dataStream;
+		private void updateBuffer<T>(D3D11.Buffer buffer,T[] data,int count) where T:struct {
+			context.MapSubresource(buffer,D3D11.MapMode.WriteDiscard,D3D11.MapFlags.None,out dataStream);
+			dataStream.WriteRange(data,0,count);
+			context.UnmapSubresource(positionBuffer,0);
+		}
+
 		public void flush() {
 			if(indexPos==0)
 				return;
-			SharpDX.DataStream dataStream;
 
 			context.MapSubresource(indexBuffer,D3D11.MapMode.WriteDiscard,D3D11.MapFlags.None,out dataStream);
 			dataStream.WriteRange<int>(indices,0,indexPos);
@@ -282,19 +314,21 @@ namespace SharpGraphics {
 			context.InputAssembler.SetIndexBuffer(indexBuffer,SharpDX.DXGI.Format.R32_UInt,0);
 
 			if(positionPos>0) {
-				context.MapSubresource(positionBuffer,D3D11.MapMode.WriteDiscard,D3D11.MapFlags.None,out dataStream);
-				dataStream.WriteRange<Vector3>(positions,0,positionPos);
-				context.UnmapSubresource(positionBuffer,0);
-
+				updateBuffer(positionBuffer,positions,positionPos);
 				context.InputAssembler.SetVertexBuffers(0,positionBinding);
+				positionPos = 0;
+
+				if(colorPos>0) {
+					updateBuffer(colorBuffer,colors,colorPos);
+					context.InputAssembler.SetVertexBuffers(1,colorBinding);
+					colorPos = 0;
+				}
 
 				context.DrawIndexed(indexPos,0,0);
-				positionPos = 0;
 			}
 
 			if(posUVColorPos>0) {
 				context.MapSubresource(posUVColorBuffer,D3D11.MapMode.WriteDiscard,D3D11.MapFlags.None,out dataStream);
-				//dataStream.WriteRange<float>(posUVColorData,0,posUVColorPos*4*4);
 				dataStream.WriteRange<PosUVColor>(posUVColorVals,0,posUVColorPos);
 				context.UnmapSubresource(posUVColorBuffer,0);
 
