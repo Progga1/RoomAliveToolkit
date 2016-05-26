@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -1314,9 +1314,9 @@ namespace RoomAliveToolkit
             }
         }
 
-        public void SaveToOBJ(string directory, string objPath)
+        public void SaveToOBJ(string directory, string objPath, int downScale)
         {
-            var objFilename = Path.GetFileNameWithoutExtension(objPath);
+			var objFilename = Path.GetFileNameWithoutExtension(objPath);
             var objDirectory = Path.GetDirectoryName(objPath);
 
             if (!Directory.Exists(objDirectory))
@@ -1341,7 +1341,8 @@ namespace RoomAliveToolkit
 
             foreach (var camera in cameras)
             {
-                mtlFileWriter.WriteLine("newmtl camera" + camera.name);
+
+				mtlFileWriter.WriteLine("newmtl camera" + camera.name);
                 mtlFileWriter.WriteLine("Ka 1.000000 1.000000 1.000000");
                 mtlFileWriter.WriteLine("Kd 1.000000 1.000000 1.000000");
                 mtlFileWriter.WriteLine("Ks 0.000000 0.000000 0.000000");
@@ -1358,15 +1359,19 @@ namespace RoomAliveToolkit
                 string cameraDirectory = directory + "/camera" + camera.name;
                 depthImage.LoadFromFile(cameraDirectory + "/mean.bin");
 
-                var calibration = camera.calibration;
+				int downW = Kinect2Calibration.depthImageWidth / downScale;
+				int downH = Kinect2Calibration.depthImageHeight / downScale;
+
+				var calibration = camera.calibration;
                 var depthFrameToCameraSpaceTable = calibration.ComputeDepthFrameToCameraSpaceTable();
-                var vertices = new Vertex[Kinect2Calibration.depthImageWidth * Kinect2Calibration.depthImageHeight];
+                var vertices = new Vertex[downW * downH];
                 var colorCamera = new Matrix(4, 1);
                 var depthCamera = new Matrix(4, 1);
                 var world = new Matrix(4, 1);
 
-                for (int y = 0; y < Kinect2Calibration.depthImageHeight; y++)
-                    for (int x = 0; x < Kinect2Calibration.depthImageWidth; x++)
+				int i = 0;
+				for (int y = 0; y < Kinect2Calibration.depthImageHeight; y+=downScale)
+                    for (int x = 0; x < Kinect2Calibration.depthImageWidth; x+=downScale)
                     {
                         // depth camera coords
                         var depth = depthImage[x, y] / 1000f; // m
@@ -1397,7 +1402,7 @@ namespace RoomAliveToolkit
                         vertex.z = (float)world[2];
                         vertex.u = (float)colorU;
                         vertex.v = (float)colorV;
-                        vertices[Kinect2Calibration.depthImageWidth * y + x] = vertex;
+                        vertices[i++] = vertex;
 
                     }
 
@@ -1405,16 +1410,16 @@ namespace RoomAliveToolkit
                 streamWriter.WriteLine("usemtl camera" + camera.name);
 
                 // examine each triangle
-                for (int y = 0; y < Kinect2Calibration.depthImageHeight - 1; y++)
-                    for (int x = 0; x < Kinect2Calibration.depthImageWidth - 1; x++)
+                for (int y = 0; y < downH - 1; y++)
+                    for (int x = 0; x < downW - 1; x++)
                     {
                         int offseti = 0;
                         for (int tri = 0; tri < 2; tri++)
                         {
                             // the indexes of the vertices of this triangle
-                            var i0 = Kinect2Calibration.depthImageWidth * (y + quadOffsets[offseti].Y) + (x + quadOffsets[offseti].X);
-                            var i1 = Kinect2Calibration.depthImageWidth * (y + quadOffsets[offseti + 1].Y) + (x + quadOffsets[offseti + 1].X);
-                            var i2 = Kinect2Calibration.depthImageWidth * (y + quadOffsets[offseti + 2].Y) + (x + quadOffsets[offseti + 2].X);
+                            var i0 = downW * (y + quadOffsets[offseti].Y) + (x + quadOffsets[offseti].X);
+                            var i1 = downW * (y + quadOffsets[offseti + 1].Y) + (x + quadOffsets[offseti + 1].X);
+                            var i2 = downW * (y + quadOffsets[offseti + 2].Y) + (x + quadOffsets[offseti + 2].X);
 
                             // is triangle valid?
                             bool nonZero = (vertices[i0].z != 0) && (vertices[i1].z != 0) && (vertices[i2].z != 0);

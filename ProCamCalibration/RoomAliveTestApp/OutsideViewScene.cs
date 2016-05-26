@@ -34,6 +34,8 @@ namespace ProjectionMappingApp {
 
 		SharpTexture cubeTex;
 
+		private int drawRoomMode = 1;
+
 		protected SharpMatrix vSceneWorldMat;
 
 		CameraControl cameraControl = new CameraControl();
@@ -126,14 +128,26 @@ namespace ProjectionMappingApp {
 			SharpMatrix viewMat = cameraControl.getViewMatrix();
 			setMVP(viewMat*projMat);
 
-			graphics.posColorShader.activate();
-			graphics.posColorShader.passColor(new FloatColor(1,1,1,1));
-			graphics.posColorShader.updateVSConstantBuffer(mvpTransp);
-			graphics.putPositionsMesh(rMesh.mesh);
-			//graphics.putColor(new FloatColor(0.5f,1,1,1),rMesh.mesh.vertices.Count);
-			graphics.putColorsByMeshNormals(rMesh.mesh,new FloatColor(1,1,1,1),0.3f,new Vector3(1,1,-1));
-			graphics.flush();
-
+			switch(drawRoomMode) {
+				case 0:
+					singleColorShader.activate();
+					singleColorShader.passColor(new FloatColor(1,1,1,1));
+					singleColorShader.updateVSConstantBuffer(mvpTransp);
+					graphics.putPositionsMesh(rMesh.mesh);
+					graphics.flush();
+					break;
+				case 1:
+					graphics.posColorShader.activate();
+					graphics.posColorShader.passColor(new FloatColor(1,1,1,1));
+					graphics.posColorShader.updateVSConstantBuffer(mvpTransp);
+					graphics.putColorsByMeshNormals(rMesh.mesh,new FloatColor(1,1,1,1),0.3f,new Vector3(1,1,-1));
+					graphics.putPositionsMesh(rMesh.mesh);
+					graphics.flush();
+					break;
+				case 2:
+					graphics.drawMesh(rMesh,mvp,new FloatColor(1),Vector3.Zero);
+					break;
+			}
 
 			//--Draw-frustums--
 			viewMat = cameraControl.getViewMatrix();
@@ -219,6 +233,12 @@ namespace ProjectionMappingApp {
 				head.position.Y += HEAD_STEP;
 			if(ev.code==Keys.S)
 				head.position.Y -= HEAD_STEP;
+			if(ev.code==Keys.R) {
+				drawRoomMode++;
+				if(drawRoomMode>2)
+					drawRoomMode = 0;
+			}
+
 		}
 
 	}

@@ -21,7 +21,7 @@ namespace SharpGraphics {
 
 	public class GFX : IDisposable {
 
-		const int MAX_VERTICES = 100000;
+		const int MAX_VERTICES = 1600000;
 
 		public struct PosUVColor {
 			public Vector3 position;
@@ -279,11 +279,14 @@ namespace SharpGraphics {
 		public void drawMesh(RoomMesh rMesh,SharpMatrix mvp,FloatColor colorFactor,Vector3 lightNormal) {
 			mvp.Transpose();
 			context.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
+			bool useLight = lightNormal!=Vector3.Zero;
 			foreach(var subset in rMesh.mesh.subsets) {
 				putPositionsMesh(rMesh.mesh,subset.start,subset.length);
 				putUVsMesh(rMesh.mesh,subset.start,subset.length);
-				//graphics.putColor(FloatColor.White,subset.length);
-				putColorsByMeshNormals(rMesh.mesh,new FloatColor(subset.material.diffuseColor),0.05f,lightNormal,subset.start,subset.length);
+				if(useLight)
+					putColorsByMeshNormals(rMesh.mesh,new FloatColor(subset.material.diffuseColor),0.05f,lightNormal,subset.start,subset.length);
+				else
+					putColor(FloatColor.White,subset.length);
 				if(subset.material.textureFilename == null) {
 					posColorShader.activate();
 					posColorShader.passColor(colorFactor);

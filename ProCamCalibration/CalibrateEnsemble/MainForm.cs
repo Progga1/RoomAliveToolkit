@@ -1,4 +1,4 @@
-﻿using SharpDX;
+using SharpDX;
 using SharpDX.D3DCompiler;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
@@ -25,7 +25,9 @@ namespace RoomAliveToolkit
         public MainForm(string[] args)
         {
             InitializeComponent();
-            this.args = args;
+			hiResToolStripMenuItem.Click += saveToOBJToolStripMenuItem_Click;
+			lowResToolStripMenuItem.Click += saveToOBJToolStripMenuItem_Click;
+			this.args = args;
         }
 
         ProjectorCameraEnsemble ensemble;
@@ -820,7 +822,7 @@ namespace RoomAliveToolkit
             {
                 try
                 {
-                    ensemble.SaveToOBJ(directory, saveFileDialog.FileName);
+                    ensemble.SaveToOBJ(directory, saveFileDialog.FileName, (sender==saveToOBJToolStripMenuItem || sender==hiResToolStripMenuItem)?1:4);
                 }
                 catch (Exception ex)
                 {
@@ -829,7 +831,7 @@ namespace RoomAliveToolkit
             }
         }
 
-        private void discoverCamerasToolStripMenuItem_Click(object sender, EventArgs e)
+		private void discoverCamerasToolStripMenuItem_Click(object sender, EventArgs e)
         {
             new System.Threading.Thread(DiscoverCameras).Start();
         }
