@@ -1,4 +1,3 @@
-using RoomAliveTestApp;
 using SharpDX;
 using SharpDX.DXGI;
 using System;

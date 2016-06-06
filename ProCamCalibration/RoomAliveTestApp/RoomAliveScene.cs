@@ -14,7 +14,7 @@ using D3DDevice = SharpDX.Direct3D11.Device;
 using D3DDeviceContext = SharpDX.Direct3D11.DeviceContext;
 using SharpMatrix = SharpDX.Matrix;
 
-namespace RoomAliveTestApp {
+namespace RoomAliveTestApps {
 
 	class RoomAliveScene {
 

@@ -1,4 +1,3 @@
-using RoomAliveTestApp;
 using RoomAliveToolkit;
 using SharpDX;
 using SharpDX.WIC;

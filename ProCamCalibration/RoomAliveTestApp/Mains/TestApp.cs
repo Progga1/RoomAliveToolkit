@@ -18,9 +18,9 @@ using SharpGraphics;
 using RoomAliveToolkit;
 using System.Runtime.InteropServices;
 using System.Threading;
-using RoomAliveTestApp.Scenes;
+using RoomAliveTestApps.Scenes;
 
-namespace RoomAliveTestApp {
+namespace RoomAliveTestApps {
 
 	class TestApp : ApplicationContext, IDisposable, InputCallbacks {
 

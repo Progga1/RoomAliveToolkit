@@ -13,7 +13,7 @@ using SharpMatrix = SharpDX.Matrix;
 using D3DDevice = SharpDX.Direct3D11.Device;
 using D3DDeviceContext = SharpDX.Direct3D11.DeviceContext;
 
-namespace RoomAliveTestApp.Scenes {
+namespace RoomAliveTestApps.Scenes {
 
 	class QuadScene : VirtualSceneBase {
 

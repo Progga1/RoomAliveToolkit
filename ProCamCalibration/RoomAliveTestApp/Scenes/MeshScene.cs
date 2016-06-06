@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RoomAliveTestApp.Scenes {
+namespace RoomAliveTestApps.Scenes {
 
 	class MeshScene : VirtualSceneBase {
 

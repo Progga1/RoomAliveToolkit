@@ -15,7 +15,6 @@ using SharpMatrix = SharpDX.Matrix;
 using SharpGraphics.Shaders;
 using RoomAliveToolkit;
 using SharpDX.Direct3D;
-using RoomAliveTestApp;
 
 namespace SharpGraphics {
 

@@ -18,7 +18,7 @@ using SharpGraphics.Shaders;
 
 namespace RoomAliveTestApps.Scenes {
 
-	class TextureScene : VirtualSceneBase {
+	class CaptureScene : VirtualSceneBase {
 
 		public SharpTexture texture;
 

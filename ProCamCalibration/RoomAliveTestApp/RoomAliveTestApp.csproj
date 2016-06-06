@@ -36,7 +36,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>ProjectionMappingApp.ProjectionMappingApp</StartupObject>
+    <StartupObject>RoomAliveTestApps.CaptureTestApp</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="SharpDX, Version=2.6.3.0, Culture=neutral, publicKeyToken=null, processorArchitecture=MSIL">
@@ -66,19 +66,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Mains\CaptureTestApp.cs" />
+    <Compile Include="Scenes\CaptureScene.cs" />
     <Compile Include="Shaders\PosUVColorShaderSep.cs" />
     <Compile Include="Shaders\ProjectionMappingShader.cs" />
     <Compile Include="Shaders\posColorShader.cs" />
     <Compile Include="SharpGraphics\CameraControl.cs" />
-    <Compile Include="DefaultMeshes.cs" />
+    <Compile Include="SharpGraphics\DefaultMeshes.cs" />
     <Compile Include="SharpGraphics\FloatColor.cs" />
     <Compile Include="SharpGraphics\InputCallbacks.cs" />
     <Compile Include="SharpGraphics\MatrixOps.cs" />
-    <Compile Include="OutsideViewScene.cs" />
-    <Compile Include="ProjectionMappingApp.cs" />
+    <Compile Include="Scenes\OutsideViewScene.cs" />
+    <Compile Include="Mains\ProjectionMappingApp.cs" />
     <Compile Include="SharpGraphics\RenderSurface.cs" />
     <Compile Include="RoomAliveScene.cs" />
-    <Compile Include="RoomMesh.cs" />
+    <Compile Include="SharpGraphics\RoomMesh.cs" />
     <Compile Include="SharpGraphics\SharpTexture.cs" />
     <Compile Include="SharpGraphics\VirtualScene.cs" />
     <Compile Include="Scenes\MeshScene.cs" />
@@ -89,7 +91,7 @@
     <Compile Include="Shaders\PosUVColorShader.cs" />
     <Compile Include="Shaders\SingleColorShader.cs" />
     <Compile Include="SharpGraphics\SharpGraphics.cs" />
-    <Compile Include="TestApp.cs" />
+    <Compile Include="Mains\TestApp.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SharpGraphics\TextureLoader.cs" />
   </ItemGroup>

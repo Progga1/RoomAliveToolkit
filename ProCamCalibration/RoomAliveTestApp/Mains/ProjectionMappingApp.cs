@@ -1,4 +1,4 @@
-using RoomAliveTestApp;
+using RoomAliveTestApps.Scenes;
 using RoomAliveToolkit;
 using SharpGraphics;
 using System;
@@ -9,7 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace ProjectionMappingApp {
+namespace RoomAliveTestApps {
 
 	class ProjectionMappingApp : ApplicationContext,IDisposable {
 

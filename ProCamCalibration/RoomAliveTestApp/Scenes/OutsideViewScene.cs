@@ -1,5 +1,4 @@
-using RoomAliveTestApp;
-using RoomAliveTestApp.Scenes;
+using RoomAliveTestApps.Scenes;
 using RoomAliveToolkit;
 using SharpDX;
 using SharpDX.Direct3D;
@@ -16,7 +15,7 @@ using System.Windows.Forms;
 using RoomMatrix = RoomAliveToolkit.Matrix;
 using SharpMatrix = SharpDX.Matrix;
 
-namespace ProjectionMappingApp {
+namespace RoomAliveTestApps.Scenes {
 
 	class OutsideViewScene : VirtualSceneBase {
 
