@@ -1,17 +1,8 @@
 using SharpDX;
 using SharpDX.Direct3D;
-using SharpDX.DXGI;
 using SharpGraphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using D3D11 = SharpDX.Direct3D11;
 using SharpMatrix = SharpDX.Matrix;
-using D3DDevice = SharpDX.Direct3D11.Device;
-using D3DDeviceContext = SharpDX.Direct3D11.DeviceContext;
 
 namespace RoomAliveTestApps.Scenes {
 

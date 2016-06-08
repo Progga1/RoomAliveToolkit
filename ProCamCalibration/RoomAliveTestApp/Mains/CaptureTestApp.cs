@@ -1,8 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using SharpDX;
 using SharpDX.Direct3D11;
@@ -30,10 +26,9 @@ namespace RoomAliveTestApps {
 
 		[STAThread]
 		static int Main(string[] args) {
-			using(CaptureTestApp app = new CaptureTestApp()) {
+            using (CaptureTestApp app = new CaptureTestApp()) {
 				Application.Run(app);
 			}
-
 			return 0;
 		}
 

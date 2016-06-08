@@ -1,14 +1,8 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SharpDX;
 using SharpDX.Direct3D11;
-using SharpDX.D3DCompiler;
 using SharpDX.Windows;
 using SharpDX.DXGI;
-using SharpDX.WIC;
 
 using D3D11 = SharpDX.Direct3D11;
 using D3DDevice = SharpDX.Direct3D11.Device;
@@ -18,7 +12,9 @@ using System.Windows.Forms;
 
 namespace SharpGraphics {
 
-	public class RenderSurface : IDisposable {
+    public delegate void OnDrawDel(D3DDeviceContext context, RenderSurface surface);
+
+    public class RenderSurface : IDisposable {
 
 		public int width { get; private set; }
 		public int height { get; private set; }
@@ -28,7 +24,7 @@ namespace SharpGraphics {
 		public GFX graphics;
 
 		//Callbacks
-		private Action<D3DDeviceContext,RenderSurface> OnDraw;
+        private OnDrawDel OnDraw;
 		private InputCallbacks inputCallbacks;
 		private NormMouseEvent mouseEvent = new NormMouseEvent();
 		private MouseWheelEvent mouseWheelEvent = new MouseWheelEvent();
@@ -48,7 +44,7 @@ namespace SharpGraphics {
 		//Rendering
 		private Matrix projMat;
 
-		public RenderSurface(Action<D3DDeviceContext,RenderSurface> drawCallback) {
+		public RenderSurface(OnDrawDel drawCallback) {
 			OnDraw = drawCallback;
 		}
 

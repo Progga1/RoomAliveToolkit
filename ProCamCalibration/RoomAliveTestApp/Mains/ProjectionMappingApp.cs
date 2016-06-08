@@ -1,12 +1,7 @@
 using RoomAliveTestApps.Scenes;
-using RoomAliveToolkit;
 using SharpGraphics;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace RoomAliveTestApps {

@@ -1,13 +1,5 @@
-using RoomAliveToolkit;
 using SharpDX;
-using SharpDX.Direct3D;
-using SharpDX.WIC;
 using SharpGraphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RoomAliveTestApps.Scenes {
 
